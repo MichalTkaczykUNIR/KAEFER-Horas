@@ -1,0 +1,2999 @@
+Horas_Lista As screen:
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    Fill: =RGBA(255,255,255,1)
+    ImagePosition: =ImagePosition.Fill
+    OnHidden: =Set(_fecha_editar,Today())
+    OnVisible: |
+        =Reset(TextInput3_2);
+        Refresh(Reg_Entradas);
+        UpdateContext({popup_eliminar_registro:false});
+        ClearCollect(
+            col_LISTAS_IND_SP_VAR,
+            AddColumns(
+                ShowColumns(col_LISTAS_IND_SP,"Trabajador"),
+                "MHE","","MN_3","","HN_3","","HE_3","","DC_3","","DM_3",""
+            )
+        );
+        UpdateContext({form_reset: true});
+        UpdateContext({form_reset: false});
+        UpdateContext({aceptar_horas: false});
+        //Cargo Registros de entradas, salidas y horas relativos a la fecha y el centro
+        Concurrent(
+            ClearCollect(
+                col_HORAS_SP_Diario,
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        APROBACI_x00d3_N = "PENDIENTE",
+                        APROBACI_x00d3_N = "APROBADO",
+                        APROBACI_x00d3_N = "CASTILLA"
+                    ),
+                    Fecha = Text(
+                        DatePicker3_2.SelectedDate,
+                        "[$-es]dd/mm/yyyy"
+                    )
+                )
+            );
+            ClearCollect(
+                col_Reg_Entradas,
+                Filter(
+                    Reg_Entradas,
+                    Fecha = Text(
+                        DatePicker3_2.SelectedDate,
+                        "[$-es]dd/mm/yyyy"
+                    )
+                )
+            ),
+            ClearCollect(
+                col_Reg_Salidas,
+                Filter(
+                    Reg_Salidas,
+                    Fecha = Text(
+                        DatePicker3_2.SelectedDate,
+                        "[$-es]dd/mm/yyyy"
+                    )
+                )
+            )
+        );
+        Reset(Checkbox8_1);
+        UpdateContext({reset_aceptar_horas: true});
+        UpdateContext({reset_aceptar_horas: false});
+
+    Label5_35 As label:
+        Align: =Align.Right
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="Ausencia"
+        Width: =200
+        X: =1154
+        Y: =94
+        ZIndex: =3
+
+    Label38 As label:
+        Align: =Align.Center
+        Height: =23
+        Size: =8
+        Text: ="(Media Dieta)"
+        Width: =95
+        X: =960
+        Y: =73
+        ZIndex: =4
+
+    Label5_33 As label:
+        Align: =Align.Right
+        Color: =RGBA(166, 166, 166, 1)
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="/ Hrs. Asign."
+        Width: =200
+        X: =1043
+        Y: =94
+        ZIndex: =5
+
+    Horas_Automaticas As checkbox:
+        Height: =32
+        OnCheck: =Notify("Recuerde confirmar las horas sugeridas, de lo contrario no se guardarán.",1,5000)
+        OnUncheck: |-
+            =UpdateContext({aceptar_horas: false});
+            UpdateContext({reset_aceptar_horas: true});
+            UpdateContext({reset_aceptar_horas: false})
+        Reset: =form_reset
+        Size: =10
+        Text: ="Horas Automáticas"
+        Width: =188
+        X: =433
+        Y: =77
+        ZIndex: =6
+
+    "Gallery1_2 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        DelayItemLoading: =true
+        Height: =652
+        Items: |-
+            =Sort(
+                Filter(col_LISTAS_IND_SP,
+                    TextInput7_1.Text in Trabajador),
+                Value(Trabajador)
+            )
+        Layout: =Layout.Vertical
+        LoadingSpinner: =LoadingSpinner.Data
+        TemplatePadding: =0
+        TemplateSize: =100
+        Width: =1366
+        Y: =116
+        ZIndex: =7
+
+        codigo_completo As label:
+            Height: =22
+            Text: |
+                =If(
+                    Len(ThisItem.Trabajador)=6,
+                    Text(ThisItem.Trabajador),
+                        If(
+                            Len(ThisItem.Trabajador)=5,
+                            "0"&Text(ThisItem.Trabajador),
+                                If(
+                                    Len(ThisItem.Trabajador)=4,
+                                    "00"&Text(ThisItem.Trabajador),
+                                        If(
+                                            Len(ThisItem.Trabajador)=3,
+                                            "000"&Text(ThisItem.Trabajador),
+                                                If(
+                                                    Len(ThisItem.Trabajador)=2,
+                                                    "0000"&Text(ThisItem.Trabajador),
+                                                        If(
+                                                            Len(ThisItem.Trabajador)=1,
+                                                            "00000"&Text(ThisItem.Trabajador)
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+            Visible: =false
+            Width: =201
+            X: =17
+            Y: =78
+            ZIndex: =1
+
+        HE_Automáticas As label:
+            Height: =32
+            OnSelect: =Select(Parent)
+            Size: =5
+            Text: |-
+                =If(
+                    Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                    If(
+                        Or(
+                            Weekday(DatePicker3_2.SelectedDate) = 7,
+                            Weekday(DatePicker3_2.SelectedDate) = 1
+                        ),
+                        If(
+                            Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text) <= 0,
+                            "",
+                            Min(
+                                Max(
+                                    RoundDown(
+                                        Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text) - 1,
+                                        0
+                                    ),
+                                    0
+                                ),
+                                12
+                            )
+                        ),
+                        If(
+                            Value(Horas_Asignadas.Text) >= 8,
+                            "",
+                            If(
+                                CountRows(Horas_Entrada_Salida.AllItems) > 0,
+                                If(
+                                    Round(
+                                        Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text),
+                                        0
+                                    ) > 8,
+                                    Min(
+                                        Max(
+                                            RoundDown(
+                                                Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text) - 8,
+                                                0
+                                            ) - 1,
+                                            0
+                                        ),
+                                        4
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            Visible: |
+                =false
+            Width: =60
+            X: =1306
+            Y: =68
+            ZIndex: =2
+
+        HN_Automáticas As label:
+            Height: =20
+            OnSelect: =Select(Parent)
+            Text: |-
+                =If(
+                    Or(
+                        Weekday(DatePicker3_2.SelectedDate) = 7,
+                        Weekday(DatePicker3_2.SelectedDate) = 1
+                    ),
+                    "",
+                    If(
+                        Value(Horas_Asignadas.Text) >= 8,
+                        "",
+                        If(
+                            CountRows(Horas_Entrada_Salida.AllItems) > 0,
+                            Min(
+                                Max(
+                                    Round(
+                                        8 - Value(Horas_Asignadas.Text),
+                                        0
+                                    ),
+                                    0
+                                ),
+                                8
+                            )
+                        )
+                    )
+                )
+            Visible: =false
+            Width: =49
+            X: =1317
+            Y: =79
+            ZIndex: =3
+
+        Estado As label:
+            Fill: =RGBA(255,255,255,1)
+            Height: =50
+            OnSelect: =Select(Parent)
+            Size: =5
+            Text: |-
+                =If(
+                    And(
+                        If(!IsBlank(Subtitle1_11),And(IsBlank(TextInput2_26),IsBlank(TextInput2_20),IsBlank(TextInput2_25),!Checkbox6_6,!Checkbox6_7),true),
+                        If(!IsBlank(Subtitle1_22),And(IsBlank(TextInput2_26),IsBlank(TextInput2_31),IsBlank(TextInput2_32),!Checkbox6_8,!Checkbox6_9),true),
+                        If(!IsBlank(Subtitle1_29),And(IsBlank(TextInput2_26),IsBlank(TextInput2_34),IsBlank(TextInput2_35),!Checkbox6_10,!Checkbox6_11,Ausencia.SelectedText.Value="Seleccionar ausencia"),true),
+                        Value(HN_1.Text)=0,
+                        Value(HE_1.Text)=0,
+                        IsBlank(TextInput2_26.HintText)
+                    ),
+                    "VACÍO",
+                    If(!(Sum(
+                            If(!IsBlank(Subtitle1_11),Value(TextInput2_20.Text)+Value(TextInput2_25.Text)),
+                            If(!IsBlank(Subtitle1_22),Value(TextInput2_31.Text)+Value(TextInput2_32.Text)),
+                            If(!IsBlank(Subtitle1_29),Value(TextInput2_34.Text)+Value(TextInput2_35.Text)),
+                            Value(HN_1.Text),
+                            Value(HE_1.Text)
+                        )=0),
+                        If(
+                            Sum(
+                                If(!IsBlank(Subtitle1_11),Value(TextInput2_20.Text)),
+                                If(!IsBlank(Subtitle1_22),Value(TextInput2_31.Text)),
+                                If(!IsBlank(Subtitle1_29),Value(TextInput2_34.Text)),
+                                Value(HN_1.Text)
+                            )<8,
+                            "MENOS DE 8 HN",
+                            If(
+                                Sum(
+                                    If(!IsBlank(Subtitle1_11),Value(TextInput2_20.Text)),
+                                    If(!IsBlank(Subtitle1_22),Value(TextInput2_31.Text)),
+                                    If(!IsBlank(Subtitle1_29),Value(TextInput2_34.Text)),
+                                    Value(HN_1.Text)
+                                )=8,
+                                "IGUAL A 8 HN",
+                                If(
+                                    Sum(
+                                        If(!IsBlank(Subtitle1_11),Value(TextInput2_20.Text)),
+                                        If(!IsBlank(Subtitle1_22),Value(TextInput2_31.Text)),
+                                        If(!IsBlank(Subtitle1_29),Value(TextInput2_34.Text)),
+                                        Value(HN_1.Text)
+                                    )>8,
+                                    "MAYOR A 8 HN"
+                                )
+                            )
+                        ),
+                        If(
+                            Or(
+                                If(!IsBlank(TextInput2_26.Text),Or(!IsBlank(Subtitle1_11),!IsBlank(Subtitle1_22),!IsBlank(Subtitle1_29)),false),
+                                If(!(Ausencia.SelectedText.Value="Seleccionar Ausencia"),!IsBlank(Subtitle1_29),false),
+                                !IsBlank(TextInput2_26.HintText)
+                            ),
+                            "COMENTARIO O AUSENCIA",
+                            If(
+                                Or(
+                                    If(!IsBlank(Subtitle1_11),Or(Checkbox6_6,Checkbox6_7),false),
+                                    If(!IsBlank(Subtitle1_22),Or(Checkbox6_8,Checkbox6_9),false),
+                                    If(!IsBlank(Subtitle1_29),Or(Checkbox6_10,Checkbox6_11),false)
+                                ),
+                                "SOLO DIETA",
+                                "CASO NO CONTEMPLADO"
+                            )
+                        )
+                    )
+                )
+            Visible: =false
+            Width: =49
+            X: =1317
+            Y: =50
+            ZIndex: =4
+
+        Codigo_Ausencia As label:
+            Height: =24
+            OnSelect: =Select(Parent)
+            Text: =LookUp(col_Conceptos_Partes,Ausencia.SelectedText.Value=Concepto,Title)
+            Visible: =false
+            Width: =256
+            X: =1038
+            Y: =66
+            ZIndex: =5
+
+        HE_1 As label:
+            Height: =35
+            OnSelect: =""
+            Text: |-
+                =If(
+                    IsBlank(
+                        Sum(
+                            Filter(
+                                col_HORAS_SP_Diario,
+                                Value(Codigo) = Value(ThisItem.Trabajador),
+                                Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                            ),
+                            HE
+                        )
+                    ),
+                    "0",
+                    Sum(
+                        Filter(
+                            col_HORAS_SP_Diario,
+                            Value(Codigo) = Value(ThisItem.Trabajador),
+                            Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                        ),
+                        HE
+                    )
+                )
+            Visible: |
+                =false
+            Width: =28
+            X: =1338
+            Y: =65
+            ZIndex: =14
+
+        HN_1 As label:
+            Height: =24
+            OnSelect: =""
+            Text: |-
+                =If(
+                    IsBlank(
+                        Sum(
+                            Filter(
+                                col_HORAS_SP_Diario,
+                                Value(Codigo) = Value(ThisItem.Trabajador),
+                                Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                            ),
+                            HN
+                        )
+                    ),
+                    "0",
+                    Sum(
+                        Filter(
+                            col_HORAS_SP_Diario,
+                            Value(Codigo) = Value(ThisItem.Trabajador),
+                            Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                        ),
+                        HN
+                    )
+                )
+            Visible: |
+                =false
+            Width: =28
+            X: =1338
+            Y: =34
+            ZIndex: =15
+
+        Comentarios_1 As label:
+            Height: =29
+            OnSelect: =""
+            Text: |-
+                =Concat(Filter(col_HORAS_SP_Diario,Codigo=ThisItem.Trabajador,Fecha=Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")),Comentarios
+                )
+            Visible: =false
+            Width: =28
+            X: =1338
+            ZIndex: =16
+
+        Image1_3 As image:
+            Height: =25
+            Image: =""
+            OnSelect: =""
+            Visible: =false
+            Width: =27
+            Y: =4
+            ZIndex: =17
+
+        Codigo_1 As label:
+            Height: =29
+            OnSelect: =""
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =18
+            Text: =Value(ThisItem.Trabajador)
+            VerticalAlign: =VerticalAlign.Top
+            Width: =90
+            X: =20
+            Y: =8
+            ZIndex: =18
+
+        Separator1_2 As rectangle:
+            Height: =2
+            OnSelect: =""
+            Width: =Parent.TemplateWidth
+            Y: =98
+            ZIndex: =19
+
+        Nombre_col As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            OnSelect: =""
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =15
+            Text: =LookUp(col_SAP_Operarios_Activos,Value(ThisItem.Trabajador)=Value(Codigo),'Full Name')
+            VerticalAlign: =VerticalAlign.Top
+            Width: =371
+            X: =109
+            Y: =9
+            ZIndex: =21
+
+        Subtitle1_11 As label:
+            Height: =25
+            OnSelect: =""
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =6
+            Text: |-
+                =If(Len(TextInput2_19.Text)=7,
+                    LookUp(col_SAP_Montajes,TextInput2_19.Text=Proyecto,CardName&" - "&Name),
+                    LookUp(col_SAP_Montajes,Left(TextInput2_19.Text,5)=Left(Proyecto,5),CardName&" - "&Name)
+                )
+            Width: =129
+            X: =480
+            Y: =3
+            ZIndex: =26
+
+        Subtitle1_22 As label:
+            Height: =25
+            OnSelect: =""
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =6
+            Text: |-
+                =If(
+                    Len(TextInput2_30.Text)=7,
+                    LookUp(col_SAP_Montajes,TextInput2_30.Text=Proyecto,CardName&" - "&Name),
+                    LookUp(col_SAP_Montajes,Left(TextInput2_30.Text,5)=Left(Proyecto,5),CardName&" - "&Name)
+                )
+            Width: =129
+            X: =480
+            Y: =33
+            ZIndex: =27
+
+        Subtitle1_29 As label:
+            Height: =25
+            OnSelect: =""
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =6
+            Text: |-
+                =If(Len(TextInput2_33.Text)=7,
+                    LookUp(col_SAP_Montajes,TextInput2_33.Text=Proyecto,CardName&" - "&Name),
+                    LookUp(col_SAP_Montajes,Left(TextInput2_33.Text,5)=Left(Proyecto,5),CardName&" - "&Name)
+                )
+            Width: =129
+            X: =480
+            Y: =63
+            ZIndex: =28
+
+        Rectangle1_4 As rectangle:
+            Fill: |-
+                =If(
+                    Estado.Text="VACÍO",
+                    RGBA(255, 229, 0, 1),
+                    If(
+                        Estado.Text="MENOS DE 8 HN",
+                        RGBA(246, 88, 16, 1),
+                        If(
+                            Estado.Text="IGUAL A 8 HN",
+                            RGBA(54, 176, 75, 1),
+                            If(
+                                Estado.Text="MAYOR A 8 HN",
+                                RGBA(224, 22, 0, 1),
+                                If(
+                                    Estado.Text="COMENTARIO O AUSENCIA",
+                                    RGBA(0, 18, 107, 1),
+                                    If(
+                                        Estado.Text="SOLO DIETA",
+                                        RGBA(0, 18, 107, 1),
+                                        If(
+                                            Estado.Text="CASO NO CONTEMPLADO",
+                                            RGBA(0, 0, 0, 1)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            OnSelect: =""
+            Tooltip: =Estado.Text
+            Width: =10
+            ZIndex: =29
+
+        Horas_Entrada_Salida As gallery.galleryVertical:
+            Height: =41
+            Items: |
+                =    Filter(
+                        col_Reg_Entradas,
+                        Value(Codigo_1.Text)=Value(Codigo)
+                    )
+            Layout: =Layout.Vertical
+            OnSelect: =""
+            ShowScrollbar: =false
+            TemplatePadding: =0
+            TemplateSize: =18
+            Width: =144
+            WrapCount: =0
+            X: =12
+            Y: =58
+            ZIndex: =44
+
+            Hora_Entrada As label:
+                Align: =Align.Center
+                Height: =12
+                OnSelect: =Select(Parent)
+                Size: =10
+                Text: =ThisItem.'Hora Entrada'
+                Width: =65
+                ZIndex: =1
+
+            Hora_Salida As label:
+                Align: =Align.Center
+                Height: =12
+                OnSelect: =Select(Parent)
+                Size: =10
+                Text: =LookUp(col_Reg_Salidas,Validar1=ThisItem.Validar1,'Hora Salida')
+                Width: =74
+                X: =76
+                ZIndex: =2
+
+            Horas_Obra As label:
+                Height: =12
+                OnSelect: =Select(Parent)
+                Text: =Text(DateDiff(ThisItem.Creado,LookUp(col_Reg_Salidas,Validar1=ThisItem.Validar1,Creado),Minutes)/60,"[$-es]0,00")
+                Visible: =false
+                Width: =48
+                X: =65
+                ZIndex: =3
+
+        Group2 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =44
+
+            Rectangle6_1 As rectangle:
+                Fill: =RGBA(56, 96, 178, 0.5)
+                Height: =24
+                Visible: |-
+                    =If(Horas_Automaticas.Value,
+                        ThisItem.Dieta = "208"
+                    )
+                Width: =25
+                X: =994
+                Y: =66
+                ZIndex: =6
+
+            Rectangle6 As rectangle:
+                Fill: |-
+                    =RGBA(56, 96, 178, 0.5
+                    )
+                Height: =24
+                Visible: |-
+                    =If(Horas_Automaticas.Value,
+                        ThisItem.Dieta = "207"
+                    )
+                Width: =25
+                X: =941
+                Y: =66
+                ZIndex: =7
+
+            Checkbox6_6 As checkbox:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Height: =23
+                OnSelect: =""
+                Reset: =form_reset
+                Text: =""
+                Width: =28
+                X: =939
+                Y: =8
+                ZIndex: =8
+
+            Checkbox6_8 As checkbox:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                Default: =
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Height: =23
+                OnSelect: =""
+                Reset: =form_reset
+                Text: =
+                Width: =28
+                X: =939
+                Y: =36
+                ZIndex: =9
+
+            Checkbox6_10 As checkbox:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                Default: |-
+                    =If(
+                        !IsBlank(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,DC_3)),
+                        Text(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,DC_3))="true",
+                        If(
+                            And(
+                                Checkbox8.Value,
+                                !IsBlank(TextInput2_34)
+                            ),
+                            ThisItem.Dieta = "207"
+                        )
+                    )
+                Height: =23
+                OnCheck: |-
+                    =Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{DC_3:Self.Value})
+                OnSelect: =""
+                OnUncheck: |-
+                    =Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{DC_3:Self.Value})
+                Reset: =form_reset
+                Text: =""
+                Width: =28
+                X: =939
+                Y: =65
+                ZIndex: =10
+
+            Checkbox6_7 As checkbox:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Height: =23
+                OnSelect: =""
+                Reset: =form_reset
+                Text: =""
+                Width: =28
+                X: =991
+                Y: =8
+                ZIndex: =11
+
+            Checkbox6_9 As checkbox:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                Default: =
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Height: =23
+                OnSelect: =""
+                Reset: =form_reset
+                Text: =
+                Width: =28
+                X: =991
+                Y: =36
+                ZIndex: =12
+
+            Checkbox6_11 As checkbox:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                Default: |-
+                    =If(
+                        !IsBlank(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,DM_3)),
+                        Text(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,DM_3))="true",
+                        If(
+                            And(
+                                Checkbox8.Value,
+                                !IsBlank(TextInput2_34)
+                            ),
+                            ThisItem.Dieta = "208"
+                        )
+                    )
+                Height: =23
+                OnCheck: |-
+                    =Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{DM_3:Self.Value})
+                OnSelect: =""
+                OnUncheck: |-
+                    =Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{DM_3:Self.Value})
+                Reset: =form_reset
+                Text: =""
+                Width: =28
+                X: =991
+                Y: =65
+                ZIndex: =13
+
+            TextInput2_26 As text:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =""
+                EnableSpellCheck: =true
+                Height: =50
+                HintText: |-
+                    =Concat(
+                        Filter(
+                            col_HORAS_SP_Diario,
+                            Value(ThisItem.Trabajador) = Value(Codigo),
+                            Text(
+                                DatePicker3_2.SelectedDate,
+                                "[$-es]dd/mm/yyyy"
+                            ) = Fecha
+                        ),
+                        "MN:" & Left(
+                            Montaje,
+                            5
+                        ) &"  "& If(
+                            And(
+                                !IsBlank(Cod_Ausencias),
+                                !(Cod_Ausencias = "...")
+                            ),
+                            "("&Cod_Ausencias&") "&
+                            Left(
+                                LookUp(
+                                    col_Conceptos_Partes,
+                                    Title = Cod_Ausencias,
+                                    Concepto
+                                ),
+                                25
+                            ) &"  H:"& Ausencias ,
+                            " HN:" & Value(HN) & " HE:" & Value(HE) & "   "
+                        )& If(
+                            !IsBlank(Dieta),
+                            If(
+                                Value(Dieta) = 207,
+                                "DC",
+                                If(
+                                    Value(Dieta) = 208,
+                                    "DM",
+                                    "D"
+                                )
+                            )
+                        ) & "
+                    "
+                    ) & Concat(
+                        Filter(
+                            col_HORAS_SP_Diario,
+                            Value(ThisItem.Trabajador) = Value(Codigo),
+                            Text(
+                                DatePicker3_2.SelectedDate,
+                                "[$-es]dd/mm/yyyy"
+                            ) = Fecha
+                        ),
+                        If(
+                            IsBlank(Comentarios),
+                            "",
+                            Comentarios & "
+                    "
+                        )
+                    )
+                Mode: =TextMode.MultiLine
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =9
+                Width: =300
+                X: =1038
+                Y: =7
+                ZIndex: =25
+
+            Dropdown6_1 As dropdown:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                ChevronBackground: =RGBA(136, 160, 209, 1)
+                Default: |-
+                    =If(Checkbox8.Value,
+                        If(IsBlank(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,MHE)),
+                            If(!IsBlank(HE_Automáticas),
+                                If(
+                                    Or(
+                                        Weekday(DatePicker3_2.SelectedDate) = 7,
+                                        Weekday(DatePicker3_2.SelectedDate) = 1
+                                    ),
+                                    "4",
+                                    "1"
+                                ),
+                                " "
+                            ),
+                            LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,MHE)
+                        ),
+                        LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,MHE)
+                    )
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Height: =23
+                Items: =[" ",1,2,3,4]
+                OnChange: |-
+                    =If(
+                        Self.SelectedText.Value=" ",
+                        Reset(TextInput2_25);
+                        Reset(TextInput2_32);
+                        Reset(TextInput2_35)
+                    );
+                    Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{MHE:Self.SelectedText.Value})
+                OnSelect: =""
+                PaddingBottom: =8
+                PaddingTop: =8
+                Reset: =form_reset
+                Size: =9
+                Width: =49
+                X: =874
+                Y: =8
+                ZIndex: =31
+
+            TextInput2_19 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =If(TextInput3_2.Text="","",TextInput3_2.Text)
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: |
+                    =If(
+                        IsBlank(Subtitle1_11),
+                        Reset(Self);
+                        Notify("El montaje introducido es incorrecto o no se encuentra activo",NotificationType.Error,5)
+                    )
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =98
+                X: =659
+                Y: =8
+                ZIndex: =32
+
+            TextInput2_20 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =""
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        If(
+                            Or(
+                                Weekday(DatePicker3_2.SelectedDate) = 7,
+                                Weekday(DatePicker3_2.SelectedDate) = 1
+                            ),
+                            Disabled,
+                            Edit
+                        ),
+                        Disabled
+                    )
+                Fill: =If(If(IsBlank(Self.Text),"0",Value(Self.Text))+Value(HN_1.Text)>8, RGBA(255, 0, 0, 1),RGBA(255, 255, 255, 1))
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: |-
+                    =If(
+                        Or(
+                            Value(TextInput2_20.Text) + Value(HN_1.Text) + Value(TextInput2_31.Text) + Value(TextInput2_34.Text) + Value(TextInput2_25.Text) + Value(TextInput2_32.Text) + Value(TextInput2_35.Text) + Value(HE_1.Text) > 12,
+                            Value(TextInput2_20.Text) + Value(HN_1.Text) + Value(TextInput2_31.Text) + Value(TextInput2_34.Text) > 8
+                        ),
+                        Reset(Self)
+                    )
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =49
+                X: =763
+                Y: =8
+                ZIndex: =33
+
+            TextInput2_30 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        Edit,
+                        Disabled
+                    )
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: |-
+                    =If(
+                        IsBlank(Subtitle1_22),
+                        Reset(Self);
+                        Notify("El montaje introducido es incorrecto o no se encuentra activo",NotificationType.Error,5)
+                    )
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =98
+                X: =659
+                Y: =36
+                ZIndex: =34
+
+            TextInput2_31 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =""
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        If(
+                            Or(
+                                Weekday(DatePicker3_2.SelectedDate) = 7,
+                                Weekday(DatePicker3_2.SelectedDate) = 1
+                            ),
+                            Disabled,
+                            Edit
+                        ),
+                        Disabled
+                    )
+                Fill: =If(If(IsBlank(Self.Text),"0",Value(Self.Text))+Value(HN_1.Text)>8, RGBA(255, 0, 0, 1),RGBA(255, 255, 255, 1))
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: |-
+                    =If(
+                        Or(
+                            If(IsBlank(Self.Text),"0",Value(Self.Text)) + Value(HN_1.Text) + Value(TextInput2_20.Text) + Value(TextInput2_34.Text) + Value(TextInput2_25.Text) + Value(TextInput2_32.Text) + Value(TextInput2_35.Text) + Value(HE_1.Text) > 12,
+                            If(IsBlank(Self.Text),"0",Value(Self.Text)) + Value(HN_1.Text) + Value(TextInput2_20.Text) + Value(TextInput2_34.Text) > 8
+                        ),
+                        Reset(Self)
+                    )
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =49
+                X: =763
+                Y: =36
+                ZIndex: =35
+
+            TextInput2_33 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: |-
+                    =If(
+                        Montaje_Automatico.Value,
+                        If(
+                            IsBlank(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,MN_3)),
+                            ThisItem.Montaje,
+                            LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,MN_3)
+                        ),
+                        LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,MN_3)
+                    )
+                Format: =TextFormat.Number
+                Height: =23
+                HintText: |-
+                    =If(Montaje_Automatico.Value,
+                        ThisItem.Montaje
+                    )
+                OnChange: |-
+                    =If(
+                        And(IsBlank(Subtitle1_29),!IsBlank(Self.Text)),
+                        Reset(Self);
+                        Notify("El montaje introducido es incorrecto o no se encuentra activo",NotificationType.Error,5)
+                    );
+                    Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{MN_3:Self.Text})
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =98
+                X: =659
+                Y: =65
+                ZIndex: =36
+
+            TextInput2_34 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        If(
+                            Checkbox8.Value,
+                            If(
+                                IsBlank(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,HN_3)),
+                                HN_Automáticas.Text,
+                                LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,HN_3)
+                            ),
+                            LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,HN_3)
+                        )
+                    )
+                DisplayMode: |-
+                    =If(
+                        Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                        If(
+                            Or(
+                                Weekday(DatePicker3_2.SelectedDate) = 7,
+                                Weekday(DatePicker3_2.SelectedDate) = 1
+                            ),
+                            Disabled,
+                            Edit
+                        ),
+                        Disabled
+                    )
+                Fill: =If(If(IsBlank(Self.Text),"0",Value(Self.Text))+Value(HN_1.Text)>8, RGBA(255, 0, 0, 1),RGBA(255, 255, 255, 1))
+                Format: =TextFormat.Number
+                Height: =23
+                HintText: |-
+                    =If(
+                        And(Ausencia.SelectedText.Value = "Seleccionar ausencia",Horas_Automaticas.Value),
+                        HN_Automáticas.Text
+                    )
+                OnChange: |-
+                    =If(
+                        Or(
+                            If(IsBlank(Self.Text),"0",Value(Self.Text)) + Value(HN_1.Text) + Value(TextInput2_31.Text) + Value(TextInput2_20.Text) + Value(TextInput2_25.Text) + Value(TextInput2_32.Text) + Value(TextInput2_35.Text) + Value(HE_1.Text) > 12,
+                            If(IsBlank(Self.Text),"0",Value(Self.Text)) + Value(HN_1.Text) + Value(TextInput2_31.Text) + Value(TextInput2_20.Text) > 8
+                        ),
+                        Reset(Self)
+                    );
+                    Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{HN_3:Self.Text})
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =49
+                X: =763
+                Y: =65
+                ZIndex: =37
+
+            Label5_16 As label:
+                Color: =RGBA(0, 0, 0, 0.9)
+                Height: =23
+                OnSelect: =""
+                Size: =12
+                Text: ="MN1"
+                Width: =49
+                X: =604
+                Y: =8
+                ZIndex: =38
+
+            Label5_31 As label:
+                Color: =RGBA(0, 0, 0, 0.9)
+                Height: =23
+                OnSelect: =""
+                Size: =12
+                Text: ="MN2"
+                Width: =49
+                X: =604
+                Y: =36
+                ZIndex: =39
+
+            Label5_32 As label:
+                Color: =RGBA(0, 0, 0, 0.9)
+                Height: =23
+                OnSelect: =""
+                Size: =12
+                Text: ="MN3"
+                Width: =49
+                X: =604
+                Y: =65
+                ZIndex: =40
+
+            TextInput2_25 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =""
+                DisplayMode: =If(Dropdown6_1.SelectedText.Value=" ",Disabled,Edit)
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: |-
+                    =If(
+                        Value(Self.Text) + Value(TextInput2_32.Text) + Value(TextInput2_35.Text) + Value(TextInput2_20.Text) + Value(TextInput2_31.Text) + Value(TextInput2_34.Text) + Value(HE_1.Text) + Value(HN_1.Text) > 12,
+                        Reset(Self)
+                    )
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =49
+                X: =818
+                Y: =8
+                ZIndex: =41
+
+            TextInput2_32 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =""
+                DisplayMode: =If(Dropdown6_1.SelectedText.Value=" ",Disabled,Edit)
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: |-
+                    =If(
+                        Value(Self.Text) + Value(TextInput2_25.Text)+Value(TextInput2_35.Text)+ Value(TextInput2_20.Text)+ Value(TextInput2_31.Text)+ Value(TextInput2_34.Text) + Value(HE_1.Text) + Value(HN_1.Text) > 12,
+                        Reset(Self)
+                    )
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =49
+                X: =818
+                Y: =36
+                ZIndex: =42
+
+            TextInput2_35 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: |-
+                    =If(
+                        Dropdown6_1.SelectedText.Value = " ",
+                        "",
+                        If(
+                            Ausencia.SelectedText.Value = "Seleccionar ausencia",
+                            If(
+                                Checkbox8.Value,
+                                If(
+                                    IsBlank(LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,HE_3)),
+                                    HE_Automáticas.Text,
+                                    LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,HE_3)
+                                ),
+                                LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador,HE_3)
+                            )
+                        )
+                    )
+                DisplayMode: =If(Dropdown6_1.SelectedText.Value=" ",Disabled,Edit)
+                Format: =TextFormat.Number
+                Height: =23
+                HintText: |-
+                    =If(
+                        And(Ausencia.SelectedText.Value = "Seleccionar ausencia",Horas_Automaticas.Value),
+                        If(
+                            Or(
+                                Weekday(DatePicker3_2.SelectedDate) = 7,
+                                Weekday(DatePicker3_2.SelectedDate) = 1
+                            ),
+                            If(
+                                Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text) <= 0,
+                                "",
+                                Min(
+                                    Max(
+                                        RoundDown(
+                                            Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text) - 1,
+                                            0
+                                        ),
+                                        0
+                                    ),
+                                    12
+                                )
+                            ),
+                            If(
+                                Value(Horas_Asignadas.Text) >= 8,
+                                "",
+                                If(
+                                    CountRows(Horas_Entrada_Salida.AllItems) > 0,
+                                    If(
+                                        Round(
+                                            Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text),
+                                            0
+                                        ) > 8,
+                                        Min(
+                                            Max(
+                                                RoundDown(
+                                                    Value(Horas_Obra_Suma.Text) - Value(Horas_Asignadas.Text) - 8,
+                                                    0
+                                                ) - 1,
+                                                0
+                                            ),
+                                            4
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                OnChange: |-
+                    =If(
+                        Value(Self.Text) + Value(TextInput2_32.Text)+Value(TextInput2_25.Text)+ Value(TextInput2_20.Text)+ Value(TextInput2_31.Text)+ Value(TextInput2_34.Text) + Value(HE_1.Text) + Value(HN_1.Text) > 12,
+                        Reset(Self)
+                    );
+                    Patch(col_LISTAS_IND_SP_VAR,LookUp(col_LISTAS_IND_SP_VAR,ThisItem.Trabajador=Trabajador),{HE_3:Self.Text})
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Width: =49
+                X: =818
+                Y: =65
+                ZIndex: =43
+
+            Ausencia As dropdown:
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                ChevronBackground: =RGBA(136, 160, 209, 1)
+                Color: |-
+                    =If(
+                        Ausencia.SelectedText.Value="Seleccionar ausencia",
+                        RGBA(0, 0, 0, 0.6),
+                        RGBA(0, 0, 0, 1)
+                    )
+                Default: ="Seleccionar ausencia"
+                Height: =24
+                Items: =["Seleccionar ausencia","TARRAG. HORA LIBRE DISPOSICION", "FALTA SIN JUSTIFICAR", "BAJA MEDICA", "HORAS VACACIONES", "HORAS EXTRAS FESTIVAS"]
+                OnChange: |
+                    =If(
+                        !(Ausencia.SelectedText.Value="Seleccionar ausencia"),
+                        Reset(TextInput2_20);
+                        Reset(TextInput2_31);
+                        Reset(TextInput2_34);
+                        Reset(TextInput2_19);
+                        Reset(TextInput2_25);
+                        Reset(TextInput2_32);
+                        Reset(TextInput2_35);
+                    )
+                Reset: =form_reset
+                Size: =8
+                Width: =239
+                X: =1038
+                Y: =63
+                ZIndex: =47
+
+            TextInput2_36 As text:
+                Align: =Align.Center
+                BorderColor: =RGBA(0, 18, 107, 0.5)
+                Default: =If(Ausencia.SelectedText.Value="Seleccionar ausencia","",8)
+                DisplayMode: =Edit
+                Fill: =RGBA(255,255,255,1)
+                Format: =TextFormat.Number
+                Height: =23
+                OnChange: =If(Value(TextInput2_36.Text)=0,Reset(Ausencia))
+                OnSelect: =""
+                Reset: =form_reset
+                Size: =12
+                Visible: =!(Ausencia.SelectedText.Value="Seleccionar ausencia")
+                Width: =49
+                X: =1289
+                Y: =64
+                ZIndex: =48
+
+        Horas_Obra_Suma As label:
+            Align: =Align.Center
+            Height: =18
+            OnSelect: =""
+            Size: =12
+            Text: =Sum(Horas_Entrada_Salida.AllItems,Value(Horas_Obra.Text))
+            Width: =86
+            X: =195
+            Y: =60
+            ZIndex: =45
+
+        Pendiente As label:
+            OnSelect: =Select(Parent)
+            Text: |-
+                =    If(And(Or(Value(Value(HN_1.Text)+Value(If(!IsBlank(TextInput2_19),If(IsBlank(TextInput2_20.Text),0,Value(TextInput2_20.Text)),0))+Value(If(!IsBlank(TextInput2_30),If(IsBlank(TextInput2_31.Text),0,Value(TextInput2_31.Text))))+Value(If(!IsBlank(TextInput2_33),If(IsBlank(TextInput2_34.Text),0,Value(TextInput2_34.Text))))) = 0),And(Value(If(!IsBlank(TextInput2_19),If(IsBlank(TextInput2_20.Text),0,Value(TextInput2_20.Text)),0)+If(!IsBlank(TextInput2_30),If(IsBlank(TextInput2_31.Text),0,Value(TextInput2_31.Text)))+If(!IsBlank(TextInput2_33),If(IsBlank(TextInput2_34.Text),0,Value(TextInput2_34.Text))))=0),And(IsBlank(Comentarios_1.Text),IsBlank(TextInput2_26))),
+                    0,
+                    If(Value(Value(HN_1.Text)+Value(If(!IsBlank(TextInput2_19),If(IsBlank(TextInput2_20.Text),0,Value(TextInput2_20.Text)),0))+Value(If(!IsBlank(TextInput2_30),If(IsBlank(TextInput2_31.Text),0,Value(TextInput2_31.Text))))+Value(If(!IsBlank(TextInput2_33),If(IsBlank(TextInput2_34.Text),0,Value(TextInput2_34.Text)))))>8,
+                        0,
+                        If(Value(Value(HN_1.Text)+If(!IsBlank(TextInput2_19),If(IsBlank(TextInput2_20.Text),0,Value(TextInput2_20.Text)),0)+If(!IsBlank(TextInput2_30),If(IsBlank(TextInput2_31.Text),0,Value(TextInput2_31.Text)))+If(!IsBlank(TextInput2_33),If(IsBlank(TextInput2_34.Text),0,Value(TextInput2_34.Text))))=8,
+                            1,
+                            If(Value(Value(HN_1.Text)+If(!IsBlank(TextInput2_19),If(IsBlank(TextInput2_20.Text),0,Value(TextInput2_20.Text)),0)+If(!IsBlank(TextInput2_30),If(IsBlank(TextInput2_31.Text),0,Value(TextInput2_31.Text)))+If(!IsBlank(TextInput2_33),If(IsBlank(TextInput2_34.Text),0,Value(TextInput2_34.Text))))<8,
+                                0
+                            )
+                        )
+                    )
+                )
+            Visible: |
+                =false
+            Width: =28
+            X: =1338
+            Y: =9
+            ZIndex: =46
+
+        Group18 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =50
+
+            Checkbox8 As checkbox:
+                BorderColor: |
+                    =RGBA(0, 18, 107, 0.5)
+                CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+                CheckboxSize: =30
+                Default: =aceptar_horas
+                Height: =23
+                OnSelect: =Select(Parent)
+                Reset: =Or(reset_aceptar_horas,form_reset)
+                Text: =""
+                Visible: =Horas_Automaticas.Value
+                Width: =28
+                X: =885
+                Y: =65
+                ZIndex: =49
+
+            Label5_36 As label:
+                Align: =Align.Center
+                Color: =RGBA(46, 46, 46, 1)
+                Height: =21
+                OnSelect: =
+                Size: =8
+                Text: ="Confirmar"
+                Visible: =Horas_Automaticas.Value
+                Width: =65
+                X: =867
+                Y: =42
+                ZIndex: =50
+
+        Eliminar_Registro As icon.Trash:
+            Color: =RGBA(168, 0, 0, 1)
+            Height: =18
+            Icon: =Icon.Trash
+            OnSelect: |-
+                =ClearCollect(
+                    col_registro_eliminar_HORAS_SP,
+                    Filter(
+                        col_HORAS_SP_Diario,
+                        Author.DisplayName = User().FullName,
+                        Value(Codigo) = Value(ThisItem.Trabajador),
+                        Fecha = Text(
+                            DatePicker3_2.SelectedDate,
+                            "[$-es]dd/mm/yyyy"
+                        ),
+                        Date(Right(Fecha,4),Mid(Fecha,4,2),Left(Fecha,2)) >= _fecha_corte,
+                        APROBACI_x00d3_N = "PENDIENTE"
+                    )
+                );
+                UpdateContext({popup_eliminar_registro: true})
+            Visible: |-
+                =!IsEmpty(
+                    Filter(
+                        col_HORAS_SP_Diario,
+                        Author.DisplayName = User().FullName,
+                        Value(Codigo) = Value(ThisItem.Trabajador),
+                        Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy"),
+                        APROBACI_x00d3_N = "PENDIENTE"
+                    )
+                )
+            Width: =24
+            X: =1306
+            Y: =24
+            ZIndex: =51
+
+        Group14_1 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =58
+
+            Subtitle1_23 As label:
+                Align: =Align.Center
+                Height: =50
+                OnSelect: =""
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =11
+                Text: |-
+                    ="Entrada: "
+                VerticalAlign: =VerticalAlign.Top
+                Width: =87
+                X: =5
+                Y: =38
+                ZIndex: =20
+
+            Subtitle1_24 As label:
+                Align: =Align.Center
+                Height: =20
+                OnSelect: =""
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =11
+                Text: |-
+                    ="Salida: "
+                VerticalAlign: =VerticalAlign.Top
+                Width: =100
+                X: =78
+                Y: =38
+                ZIndex: =22
+
+            Subtitle1_25 As label:
+                Align: =Align.Center
+                Height: =20
+                OnSelect: =""
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =11
+                Text: |-
+                    ="Horas en obra: "
+                VerticalAlign: =VerticalAlign.Top
+                Width: =130
+                X: =176
+                Y: =37
+                ZIndex: =23
+
+            Subtitle1_26 As label:
+                Align: =Align.Center
+                Height: =20
+                OnSelect: =""
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =11
+                Text: |-
+                    ="Horas Asignadas: "
+                VerticalAlign: =VerticalAlign.Top
+                Width: =130
+                X: =315
+                Y: =37
+                ZIndex: =24
+
+            Horas_Asignadas As label:
+                Align: =Align.Center
+                Height: =20
+                OnSelect: =""
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =11
+                Text: |-
+                    =Sum(
+                        Filter(
+                            col_HORAS_SP_Diario,
+                            Value(Codigo) = Value(ThisItem.Trabajador),
+                            Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                        ),
+                        HN
+                    ) + Sum(
+                        Filter(
+                            col_HORAS_SP_Diario,
+                            Value(Codigo) = Value(ThisItem.Trabajador),
+                            Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                        ),
+                        HE
+                    )
+                VerticalAlign: =VerticalAlign.Top
+                Visible: =!(Value(Self.Text)=0)
+                Width: =130
+                X: =315
+                Y: =59
+                ZIndex: =30
+
+    DatePicker3_2 As datepicker:
+        DefaultDate: =_fecha_editar
+        EndYear: =2022
+        Height: =30
+        OnChange: |
+            =If(
+                DatePicker3_2.SelectedDate < _fecha_corte,//;DatePicker3_2.SelectedDate > Today());
+                UpdateContext({reset_date: true});
+                UpdateContext({reset_date: false});
+                Notify("El día que seleccionó se encuentra bloqueado para ingresar horas, seleccione una fecha posterior al "&_fecha_corte&" y anterior/igual al día de hoy, gracias.",NotificationType.Error,5000),
+                ClearCollect(
+                    col_LISTAS_IND_SP_VAR,
+                    AddColumns(
+                        ShowColumns(col_LISTAS_IND_SP,"Trabajador"),
+                        "MHE","","MN_3","","HN_3","","HE_3","","DC_3","","DM_3",""
+                    )
+                );
+                UpdateContext({popup_cambios_pendientes:false,cambio_fecha:false});
+                UpdateContext({aceptar_horas:false});
+                Reset(Checkbox8_1);
+                UpdateContext({reset_aceptar_horas:true,form_reset:true});
+                UpdateContext({reset_aceptar_horas:false,form_reset:false});
+                Concurrent(
+                    ClearCollect(
+                        col_HORAS_SP_Diario,
+                        Filter(
+                            HORAS_SP,
+                            Or(
+                                APROBACI_x00d3_N = "PENDIENTE",
+                                APROBACI_x00d3_N = "APROBADO",
+                                APROBACI_x00d3_N = "CASTILLA"
+                            ),
+                            Fecha = Text(
+                                DatePicker3_2.SelectedDate,
+                                "[$-es]dd/mm/yyyy"
+                            )
+                        //;Lugar=Dropdown2_2.SelectedText.Value
+                        )
+                    ),
+                    ClearCollect(
+                        col_Reg_Entradas,
+                        Filter(
+                            Reg_Entradas,
+                            Fecha = Text(
+                                DatePicker3_2.SelectedDate,
+                                "[$-es]dd/mm/yyyy"
+                            )
+                        )
+                    ),
+                    ClearCollect(
+                        col_Reg_Salidas,
+                        Filter(
+                            Reg_Salidas,
+                            Fecha = Text(
+                                DatePicker3_2.SelectedDate,
+                                "[$-es]dd/mm/yyyy"
+                            )
+                        )
+                    )
+                );
+            );
+        OnSelect: |
+            =//Busco si hay campos válidos pendientes de guardar
+            Clear(camb_pend);
+            ForAll(
+                Gallery1_2.AllItems,
+                If(
+                    Or(
+                        And(
+                            !IsBlank(TextInput2_19),
+                            Or(
+                                !IsBlank(TextInput2_20),
+                                !IsBlank(TextInput2_25),
+                                Checkbox6_6.Value,
+                                Checkbox6_7.Value
+                            )
+                        ),
+                        And(
+                            !IsBlank(TextInput2_30),
+                            Or(
+                                !IsBlank(TextInput2_31),
+                                !IsBlank(TextInput2_32),
+                                Checkbox6_8.Value,
+                                Checkbox6_9.Value
+                            )
+                        ),
+                        And(
+                            !IsBlank(TextInput2_33),
+                            Or(
+                                !IsBlank(TextInput2_34),
+                                !IsBlank(TextInput2_35),
+                                Checkbox6_10.Value,
+                                Checkbox6_11.Value
+                            )
+                        ),
+                        !IsBlank(TextInput2_26)
+                    ),
+                    Collect(camb_pend,1)
+                )
+            );
+            //Si hay campos válidos pendientes de guardar, pregunto antes de continuar
+            If(CountRows(camb_pend)>0,
+                UpdateContext({cambios_pendientes:true}),
+                UpdateContext({cambios_pendientes:false})
+            );
+            
+            //Botón normal
+            If(cambios_pendientes,
+                UpdateContext({popup_cambios_pendientes:true});
+                UpdateContext({add_horas:false,back:false,cambio_fecha:true})
+            )
+        Reset: =reset_date
+        StartOfWeek: =StartOfWeek.Monday
+        StartYear: =2021
+        Tooltip: ="FECHA"
+        Width: =230
+        X: =66
+        Y: =39
+        ZIndex: =8
+
+    Button3_6 As button:
+        Height: =30
+        OnSelect: |
+            =//Guardo las tres líneas por registro
+            UpdateContext({popup_guardado: true});
+            ForAll(
+                Gallery1_2.AllItems,
+                Collect(
+                    col_HORAS_SP_NUEVOS,//MN1
+                    {
+                        Codigo: codigo_completo.Text,
+                        Nombre: Nombre_col.Text,
+                        Montaje: TextInput2_19.Text,
+                        HN: TextInput2_20.Text,
+                        HE: TextInput2_25.Text,
+                        Dieta: If(Checkbox6_6.Value,"207",If(Checkbox6_7.Value,"208")),
+                        Fecha: Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy"),
+                        Comentarios: TextInput2_26.Text,
+                        Motivo: Dropdown6_1.SelectedText.Value,
+                        APROBACIÓN: "PENDIENTE",
+                        Horas_Fichadas: Horas_Obra_Suma.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery1_2.AllItems,
+                Collect(
+                    col_HORAS_SP_NUEVOS,//MN2
+                    {
+                        Codigo: codigo_completo.Text,
+                        Nombre: Nombre_col.Text,
+                        Montaje: TextInput2_30.Text,
+                        HN: TextInput2_31.Text,
+                        HE: TextInput2_32.Text,
+                        Dieta: If(Checkbox6_8.Value,"207",If(Checkbox6_9.Value,"208")),
+                        Fecha: Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy"),
+                        Comentarios: TextInput2_26.Text,
+                        Motivo: Dropdown6_1.SelectedText.Value,
+                        APROBACIÓN: "PENDIENTE",
+                        Horas_Fichadas: Horas_Obra_Suma.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery1_2.AllItems,
+                Collect(
+                    col_HORAS_SP_NUEVOS,//MN3
+                    {
+                        Codigo: codigo_completo.Text,
+                        Nombre: Nombre_col.Text,
+                        Montaje: TextInput2_33.Text,
+                        HN: TextInput2_34.Text,
+                        HE: TextInput2_35.Text,
+                        Dieta: If(Checkbox6_10.Value,"207",If(Checkbox6_11.Value,"208")),
+                        Fecha: Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy"),
+                        Comentarios: TextInput2_26.Text,
+                        Motivo: Dropdown6_1.SelectedText.Value,
+                        APROBACIÓN: "PENDIENTE",
+                        Horas_Fichadas: Horas_Obra_Suma.Text,
+                        Ausencias: TextInput2_36.Text,
+                        Cod_Ausencias: Codigo_Ausencia.Text
+                    }
+                )
+            );
+            //Elimino registros en blanco
+            RemoveIf(
+                col_HORAS_SP_NUEVOS,
+                If(
+                    IsBlank(Montaje),
+                    true,
+                    And(
+                        IsBlank(HN),
+                        IsBlank(HE),
+                        IsBlank(Dieta),
+                        IsBlank(Comentarios),
+                        IsBlank(Cod_Ausencias)
+                    )
+                )
+            );
+            UpdateContext({cant_registros_nuevos: CountRows(col_HORAS_SP_NUEVOS)});
+            Notify(
+                "Se guardarán " & cant_registros_nuevos & " registros, puede tardar " & RoundUp(
+                    (cant_registros_nuevos * 1) / 60,
+                    0
+                ) & " minuto/s",
+                1,
+                2000
+            );
+            //Guardo la coleccion de cambios local a sharepoint
+            ForAll(
+                col_HORAS_SP_NUEVOS,
+                Collect(
+                    col_HORAS_SP_NUEVOS_guardadas,
+                    Patch(
+                        HORAS_SP,
+                        Defaults(HORAS_SP),
+                        {
+                            Codigo: Text(Value(ThisRecord.Codigo)),
+                            Nombre: ThisRecord.Nombre,
+                            Montaje: ThisRecord.Montaje,
+                            HN: ThisRecord.HN,
+                            HE: ThisRecord.HE,
+                            Dieta: ThisRecord.Dieta,
+                            Fecha: ThisRecord.Fecha,
+                            Comentarios: ThisRecord.Comentarios,
+                            MotivoHE: ThisRecord.Motivo,
+                            UdN: Label3.Text,
+                            APROBACI_x00d3_N: ThisRecord.APROBACIÓN,
+                            Horas_Fichadas: ThisRecord.Horas_Fichadas,
+                            Lugar: Label3_5.Text,
+                            Ausencias: ThisRecord.Ausencias,
+                            Cod_Ausencias: ThisRecord.Cod_Ausencias
+                        }
+                    );
+                )
+            );
+            UpdateContext({cant_registros_guardados: CountRows(col_HORAS_SP_NUEVOS_guardadas)});
+            
+            //Verifico si hubieron errores y me quedo con los registros que no se guardaron
+            If(
+                IsEmpty(Errors(HORAS_SP)),
+                Clear(col_HORAS_SP_NUEVOS);
+                Clear(col_HORAS_SP_NUEVOS_guardadas);
+                Clear(temp);
+                Notify(
+                    "Se guardaron " & cant_registros_nuevos & " registros nuevos",
+                    Success,
+                    2000
+                ),
+                Notify(
+                    "Error al guardar " & cant_registros_nuevos - cant_registros_guardados & "registro/s a HORAS_SP, reintentar nuevamente más tarde",
+                    NotificationType.Error,
+                    5000
+                )
+            );
+            //Actualizo desde SP los registros
+            ClearCollect(
+                col_HORAS_SP_Diario,
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        APROBACI_x00d3_N = "PENDIENTE",
+                        APROBACI_x00d3_N = "APROBADO",
+                        APROBACI_x00d3_N = "CASTILLA"
+                    ),
+                    Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                )
+            );
+            //Actualizo desde SP los registros (Otra vez, solución temporal hasta que logre poner un bendito timer)
+            ClearCollect(
+                col_HORAS_SP_Diario,
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        APROBACI_x00d3_N = "PENDIENTE",
+                        APROBACI_x00d3_N = "APROBADO",
+                        APROBACI_x00d3_N = "CASTILLA"
+                    ),
+                    Fecha = Text(DatePicker3_2.SelectedDate,"[$-es]dd/mm/yyyy")
+                )
+            );
+            
+            UpdateContext({timer_actualizacion: true});
+            UpdateContext({timer_actualizacion: false});
+            
+            //Seteo de veriables
+            UpdateContext(
+                {
+                    popup_guardado: false,
+                    form_reset: true
+                }
+            );
+            UpdateContext({form_reset: false});
+            //Limpio las variables locales de la coleccion.
+            ClearCollect(
+                col_LISTAS_IND_SP_VAR,
+                AddColumns(
+                    ShowColumns(col_LISTAS_IND_SP,"Trabajador"),
+                    "MHE","","MN_3","","HN_3","","HE_3","","DC_3","","DM_3",""
+                )
+            );
+            Set(_Update_Pendiente,true);
+        Text: ="GUARDAR"
+        Width: =123
+        X: =1015
+        Y: =23
+        ZIndex: =9
+
+    Label3_6 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =20
+        Size: =11
+        Text: |-
+            ="Nº Operarios: "&CountRows(Gallery1_2.AllItems)
+        Width: =197
+        X: =797
+        Y: =3
+        ZIndex: =10
+
+    TextInput3_2 As text:
+        Default: =""
+        Height: =25
+        HintText: ="Montaje Principal"
+        OnChange: |-
+            =If(
+                IsBlank(Subtitle1_11),
+                Reset(Self);
+                Notify("El montaje introducido es incorrecto o no se encuentra activo",NotificationType.Error,5)
+            )
+        Reset: =form_reset
+        Size: =11
+        Tooltip: ="MONTAJE PREDETERMINADO"
+        Width: =142
+        X: =656
+        Y: =61
+        ZIndex: =11
+
+    Icon1_6 As icon.ChevronRight:
+        Height: =83
+        Icon: =Icon.ChevronLeft
+        OnSelect: |
+            =//Busco si hay campos válidos pendientes de guardar
+            Clear(camb_pend);
+            ForAll(
+                Gallery1_2.AllItems,
+                If(
+                    Or(
+                        And(
+                            !IsBlank(TextInput2_19),
+                            Or(
+                                !IsBlank(TextInput2_20),
+                                !IsBlank(TextInput2_25),
+                                Checkbox6_6.Value,
+                                Checkbox6_7.Value
+                            )
+                        ),
+                        And(
+                            !IsBlank(TextInput2_30),
+                            Or(
+                                !IsBlank(TextInput2_31),
+                                !IsBlank(TextInput2_32),
+                                Checkbox6_8.Value,
+                                Checkbox6_9.Value
+                            )
+                        ),
+                        And(
+                            !IsBlank(TextInput2_33),
+                            Or(
+                                !IsBlank(TextInput2_34),
+                                !IsBlank(TextInput2_35),
+                                Checkbox6_10.Value,
+                                Checkbox6_11.Value
+                            )
+                        ),
+                        !IsBlank(TextInput2_26)
+                    ),
+                    Collect(camb_pend,1)
+                )
+            );
+            //Si hay campos válidos pendientes de guardar, pregunto antes de continuar
+            If(CountRows(camb_pend)>0,
+                UpdateContext({cambios_pendientes:true}),
+                UpdateContext({cambios_pendientes:false})
+            );
+            //Botón normal
+            If(cambios_pendientes,
+            UpdateContext({popup_cambios_pendientes:true});
+            UpdateContext({add_horas:false,cambio_fecha:false,back:true}),
+            Back(ScreenTransition.Fade))
+        Width: =50
+        Y: =10
+        ZIndex: =12
+
+    Label3_7 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =20
+        Size: =11
+        Text: |
+            ="Pendientes: " & If(
+                Or(
+                    Weekday(DatePicker3_2.SelectedDate) = 7,
+                    Weekday(DatePicker3_2.SelectedDate) = 1
+                ),
+                CountIf(
+                    Gallery1_2.AllItems,
+                    (Value(HE_1.Text) + Value(HN_1.Text)) < 8,
+                    Or(
+                        Weekday(DatePicker3_2.SelectedDate) = 7,
+                        Weekday(DatePicker3_2.SelectedDate) = 1
+                    )
+                ),
+                CountIf(
+                    Gallery1_2.AllItems,
+                    Value(Pendiente.Text) = 0
+                )
+            )
+        Width: =197
+        X: =797
+        Y: =25
+        ZIndex: =13
+
+    Solo_Pendientes As checkbox:
+        Height: =30
+        OnCheck: |
+            =ClearCollect(
+                col_Reg_Entradas_PEND,
+                AddColumns(
+                    col_Reg_Entradas,
+                    "HN",
+                    Value(
+                        Sum(
+                            Filter(
+                                col_HORAS_SP_Diario,
+                                Value(col_HORAS_SP_Diario[@Codigo]) = Value(col_Reg_Entradas[@Codigo]),
+                                col_HORAS_SP_Diario[@Fecha] = col_Reg_Entradas[@Fecha]
+                            ),
+                            HN_1
+                        )
+                    ) + If(
+                        Or(
+                            Weekday(DatePicker3_2.SelectedDate) = 7,
+                            Weekday(DatePicker3_2.SelectedDate) = 1
+                        ),
+                        Value(
+                            Sum(
+                                Filter(
+                                    col_HORAS_SP_Diario,
+                                    Value(col_HORAS_SP_Diario[@Codigo]) = Value(col_Reg_Entradas[@Codigo]),
+                                    col_HORAS_SP_Diario[@Fecha] = col_Reg_Entradas[@Fecha]
+                                ),
+                                HE_1
+                            )
+                        ),
+                        0
+                    )
+                )
+            );
+        Size: =10
+        Text: ="Solo Pendientes"
+        Visible: =false
+        Width: =167
+        X: =66
+        Y: =76
+        ZIndex: =14
+
+    Icon13_3 As icon.Cancel:
+        Height: =44
+        Icon: =Icon.Information
+        OnSelect: |-
+            =UpdateContext({popup_info:true})
+        Width: =45
+        X: =1304
+        Y: =16
+        ZIndex: =15
+
+    Button3_8 As button:
+        Fill: =RGBA(0, 18, 107, 1)
+        Height: =30
+        OnSelect: |-
+            =UpdateContext({popup_menu:true})
+        Text: ="MENÚ"
+        Width: =130
+        X: =1156
+        Y: =23
+        ZIndex: =16
+
+    Label5_25 As label:
+        Align: =Align.Center
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="HN"
+        Width: =50
+        X: =764
+        Y: =94
+        ZIndex: =17
+
+    Label5_26 As label:
+        Align: =Align.Center
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="HE"
+        Width: =50
+        X: =819
+        Y: =94
+        ZIndex: =18
+
+    Label5_28 As label:
+        Align: =Align.Center
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="Dieta"
+        Width: =50
+        X: =929
+        Y: =94
+        ZIndex: =19
+
+    Label5_29 As label:
+        Align: =Align.Center
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="Salida"
+        Width: =58
+        X: =979
+        Y: =94
+        ZIndex: =20
+
+    Label5_30 As label:
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="Comentarios"
+        Width: =200
+        X: =1043
+        Y: =94
+        ZIndex: =21
+
+    Label5_27 As label:
+        Align: =Align.Center
+        Height: =20
+        OnSelect: =
+        Size: =8
+        Text: ="Motivo HE"
+        Width: =50
+        X: =873
+        Y: =94
+        ZIndex: =22
+
+    Label5_24 As label:
+        Align: =Align.Center
+        Height: =20
+        OnSelect: =
+        Size: =12
+        Text: ="Montaje"
+        Width: =96
+        X: =657
+        Y: =94
+        ZIndex: =23
+
+    Popup_Guardado_5 As group:
+        Height: =5
+        Width: =5
+        X: =80
+        Y: =80
+        ZIndex: =23
+
+        Rectangle2_14 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_guardado
+            Width: =1366
+            ZIndex: =54
+
+        Rectangle3_15 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =296
+            Visible: =popup_guardado
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =55
+
+        Label27_14 As label:
+            Align: =Align.Center
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =149
+            Text: ="Guardando "&cant_registros_nuevos&" registro/s, por favor espere."
+            Visible: =popup_guardado
+            Width: =385
+            X: =530
+            Y: =250
+            ZIndex: =56
+
+        Label26_2 As label:
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =101
+            Text: |-
+                ="Progreso: " & IfError(
+                    Round((Value(Value(CountRows(col_HORAS_SP_NUEVOS_guardadas)))/(Value(cant_registros_nuevos)))*100,0) & "%
+                    ",
+                    "N/A"
+                ) & " 
+                Tiempo restante estimado: " & RoundUp(
+                    ((cant_registros_nuevos*2 - (CountRows(col_HORAS_SP_NUEVOS_guardadas))) * 1) / 60,
+                    0
+                ) & " minuto/s"
+            Visible: =popup_guardado
+            Width: =275
+            X: =545
+            Y: =384
+            ZIndex: =57
+
+    Label1_1 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =31
+        Text: |-
+            =LookUp(
+                Dias_semana,
+                Weekday(DatePicker3_2.SelectedDate) = Codigo,
+                Dia
+            ) & " - Semana: " & If(Weekday(DatePicker3_2.SelectedDate)=1,WeekNum(DatePicker3_2.SelectedDate)-2,WeekNum(DatePicker3_2.SelectedDate)-1)
+        Width: =249
+        X: =315
+        Y: =39
+        ZIndex: =24
+
+    Montaje_Automatico As checkbox:
+        Height: =32
+        OnCheck: =
+        Reset: =form_reset
+        Size: =10
+        Text: ="Montaje automático"
+        Width: =188
+        X: =221
+        Y: =77
+        ZIndex: =25
+
+    Label21 As label:
+        FontWeight: =FontWeight.Bold
+        Text: ="Lista personal"
+        Width: =412
+        X: =66
+        ZIndex: =26
+
+    TextInput7_1 As text:
+        Default: =""
+        Height: =32
+        HintText: ="Código"
+        Reset: =form_reset
+        Width: =130
+        X: =66
+        Y: =77
+        ZIndex: =27
+
+    Circle1_16 As circle:
+        BorderColor: =RGBA(128, 128, 128, 1)
+        BorderThickness: =1
+        Fill: =RGBA(0, 18, 107, 1)
+        Height: =30
+        Visible: =popup_info
+        Width: =30
+        X: =479
+        Y: =311
+        ZIndex: =28
+
+    Image9 As image:
+        Height: =45
+        Image: =KAEFER_Logo_Simple
+        Width: =234
+        X: =566
+        Y: =5
+        ZIndex: =29
+
+    Popup_Cambios_Pendientes_1 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =58
+
+        Rectangle2_15 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_cambios_pendientes
+            Width: =1366
+            ZIndex: =49
+
+        Rectangle3_16 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =296
+            Visible: =popup_cambios_pendientes
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =50
+
+        Label27_15 As label:
+            Align: =Align.Center
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =149
+            Text: |-
+                ="Tiene "&CountRows(camb_pend)&" registro/s pendientes de guardar, si deja esta pantalla se perderán los cambios.
+                 
+                ¿Desea continuar?"
+            Visible: =And(popup_cambios_pendientes,!cambio_fecha)
+            Width: =385
+            X: =530
+            Y: =250
+            ZIndex: =51
+
+        Button3_1 As button:
+            OnSelect: |-
+                =If(add_horas,Navigate('Add Horas',Fade));
+                If(back,Back(Fade));
+                UpdateContext({popup_cambios_pendientes:false})
+            Text: ="Continuar"
+            Visible: =And(popup_cambios_pendientes,!cambio_fecha)
+            X: =786
+            Y: =445
+            ZIndex: =52
+
+        Button5_1 As button:
+            OnSelect: |-
+                =UpdateContext({popup_cambios_pendientes:false})
+            Text: ="Volver"
+            Visible: =And(popup_cambios_pendientes,!cambio_fecha)
+            X: =515
+            Y: =445
+            ZIndex: =53
+
+        Button20_1 As button:
+            OnSelect: |-
+                =UpdateContext({popup_cambios_pendientes:false})
+            Text: ="Aceptar"
+            Visible: =And(popup_cambios_pendientes,cambio_fecha)
+            X: =644
+            Y: =457
+            ZIndex: =58
+
+        Label32_1 As label:
+            Height: =141
+            Text: ="Tiene "&CountRows(camb_pend)&" registro/s pendientes de guardar, si cambia la fecha se perderán estos cambios."
+            Visible: =And(popup_cambios_pendientes,cambio_fecha)
+            Width: =412
+            X: =519
+            Y: =296
+            ZIndex: =59
+
+    Popup_Info_1 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =60
+
+        Rectangle2_12 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_info
+            Width: =1366
+            ZIndex: =60
+
+        Rectangle3_12 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =656
+            Visible: =popup_info
+            Width: =668
+            X: =390
+            Y: =58
+            ZIndex: =61
+
+        Label27_12 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =46
+            Text: |-
+                ="Leyenda:"
+            Visible: =popup_info
+            Width: =488
+            X: =479
+            Y: =70
+            ZIndex: =62
+
+        Button6_5 As button:
+            OnSelect: |-
+                =UpdateContext({popup_info:false})
+            Text: ="Aceptar"
+            Visible: =popup_info
+            X: =638
+            Y: =647
+            ZIndex: =63
+
+        Circle1_14 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(246, 88, 16, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =478
+            Y: =216
+            ZIndex: =64
+
+        Circle1_12 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(54, 176, 75, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =478
+            Y: =116
+            ZIndex: =65
+
+        Circle1_13 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 229, 0, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =478
+            Y: =166
+            ZIndex: =66
+
+        Circle1_15 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(224, 22, 0, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =478
+            Y: =266
+            ZIndex: =67
+
+        Label33_3 As label:
+            Height: =225
+            LineHeight: =2.9
+            Text: |-
+                ="Trabajador con horas asignadas correctas
+                Trabajador sin horas asignadas
+                Trabajador con menos de 8 horas normales asignadas
+                Trabajador con más de 8 horas normales asignadas
+                Trabajador solo con comentario/ausencia"
+            Visible: =popup_info
+            Width: =453
+            X: =513
+            Y: =116
+            ZIndex: =68
+
+        Button7_8 As button:
+            OnSelect: =Navigate(Comprobacion_BI, ScreenTransition.Fade)
+            Text: ="ABRIR COMPROBACIÓN BI"
+            Visible: =popup_info
+            Width: =271
+            X: =581
+            Y: =585
+            ZIndex: =69
+
+        Label21_5 As label:
+            Height: =93
+            Size: =11
+            Text: |-
+                ="MN:    Montaje
+                HN:     Horas Normales
+                HE:     Horas Extra
+                DC:     Dieta Completa
+                DM:     Dieta Media (Salida)"
+            Visible: =popup_info
+            Width: =307
+            X: =519
+            Y: =363
+            ZIndex: =70
+
+        Label21_3 As label:
+            Height: =93
+            Size: =11
+            Text: |-
+                ="Motivos HE : 
+                1 - Parada
+                2 - Petición urgente del Cliente
+                3 - Imprevisto KAEFER
+                4 - Fin de semana y/o festivo"
+            Visible: =popup_info
+            Width: =307
+            X: =519
+            Y: =473
+            ZIndex: =71
+
+    Popup_Menu_1 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =62
+
+        Rectangle2_16 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            OnSelect: =Navigate(Modificar_Lista,Fade)
+            Visible: =popup_menu
+            Width: =1366
+            ZIndex: =72
+
+        Rectangle3_14 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =587
+            OnSelect: =Navigate(Modificar_Lista,Fade)
+            Visible: =popup_menu
+            Width: =513
+            X: =467
+            Y: =73
+            ZIndex: =73
+
+        Label27_13 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =72
+            OnSelect: =Navigate(Modificar_Lista,Fade)
+            Text: |-
+                ="Menú:"
+            Visible: =popup_menu
+            Width: =488
+            X: =478
+            Y: =91
+            ZIndex: =74
+
+        Button6_6 As button:
+            Fill: =RGBA(0, 18, 107, 1)
+            OnSelect: |-
+                =UpdateContext({popup_menu:false})
+            Text: ="Aceptar"
+            Visible: =popup_menu
+            X: =644
+            Y: =580
+            ZIndex: =75
+
+        Button7_7 As button:
+            OnSelect: |-
+                =Navigate(Comprobacion_BI,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Abrir comprobación BI"
+            Visible: =popup_menu
+            Width: =317
+            X: =563
+            Y: =457
+            ZIndex: =76
+
+        Button1_3 As button:
+            OnSelect: |-
+                =Navigate(Modificar_Lista,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Modificar lista personal"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =256
+            ZIndex: =77
+
+        Button3_9 As button:
+            Height: =64
+            OnSelect: |-
+                =//Busco si hay campos válidos pendientes de guardar
+                Clear(camb_pend);
+                ForAll(
+                    Gallery1_2.AllItems,
+                    If(
+                        Or(
+                            And(
+                                !IsBlank(TextInput2_19),
+                                Or(
+                                    !IsBlank(TextInput2_20),
+                                    !IsBlank(TextInput2_25),
+                                    Checkbox6_6.Value,
+                                    Checkbox6_7.Value
+                                )
+                            ),
+                            And(
+                                !IsBlank(TextInput2_30),
+                                Or(
+                                    !IsBlank(TextInput2_31),
+                                    !IsBlank(TextInput2_32),
+                                    Checkbox6_8.Value,
+                                    Checkbox6_9.Value
+                                )
+                            ),
+                            And(
+                                !IsBlank(TextInput2_33),
+                                Or(
+                                    !IsBlank(TextInput2_34),
+                                    !IsBlank(TextInput2_35),
+                                    Checkbox6_10.Value,
+                                    Checkbox6_11.Value
+                                )
+                            ),
+                            !IsBlank(TextInput2_26)
+                        ),
+                        Collect(camb_pend,1)
+                    )
+                );
+                //Si hay campos válidos pendientes de guardar, pregunto antes de continuar
+                If(CountRows(camb_pend)>0,
+                        UpdateContext({popup_menu:false}),
+                    UpdateContext({cambios_pendientes:true}),
+                    UpdateContext({cambios_pendientes:false})
+                );
+                //Botón normal
+                If(cambios_pendientes,
+                UpdateContext({popup_cambios_pendientes:true});
+                UpdateContext({add_horas:true,back:false}),
+                UpdateContext({popup_menu:false}),
+                Navigate('Add Horas', ScreenTransition.Fade))
+            Text: ="Agregar horas individualmente (Add HORAS)"
+            Visible: =popup_menu
+            Width: =317
+            X: =566
+            Y: =346
+            ZIndex: =78
+
+        Button1_2 As button:
+            Fill: =RGBA(55, 122, 179, 1)
+            OnSelect: |-
+                =Navigate(Horas,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Lista Fichajes"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =193
+            ZIndex: =79
+
+        Button7_10 As button:
+            OnSelect: |-
+                =Navigate(Comprobacion_PA,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Abrir comprobación PA"
+            Visible: =popup_menu
+            Width: =317
+            X: =563
+            Y: =515
+            ZIndex: =80
+
+    Group18_1 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =64
+
+        Checkbox8_1 As checkbox:
+            BorderColor: |
+                =RGBA(0, 18, 107, 0.5)
+            CheckboxBorderColor: =RGBA(0, 18, 107, 0.5)
+            CheckboxSize: =30
+            Default: =aceptar_horas
+            Height: =23
+            OnCheck: |-
+                =UpdateContext({aceptar_horas:true});
+                UpdateContext({reset_aceptar_horas:true});
+                UpdateContext({reset_aceptar_horas:false});
+            OnSelect: =
+            OnUncheck: |-
+                =UpdateContext({aceptar_horas:false});
+                UpdateContext({reset_aceptar_horas:true});
+                UpdateContext({reset_aceptar_horas:false});
+            Reset: =Or(reset_aceptar_horas,form_reset)
+            Text: =""
+            Visible: =Horas_Automaticas.Value
+            Width: =32
+            X: =842
+            Y: =64
+            ZIndex: =1
+
+        Label5_37 As label:
+            Color: =RGBA(46, 46, 46, 1)
+            Height: =19
+            OnSelect: =
+            Size: =8
+            Text: ="Confirmar todos"
+            Visible: =Horas_Automaticas.Value
+            Width: =92
+            X: =868
+            Y: =67
+            ZIndex: =2
+
+    Popup_Eliminar_Horas As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =90
+
+        Rectangle2_24 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_eliminar_registro
+            Width: =1366
+            ZIndex: =30
+
+        Rectangle3_24 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =602
+            Visible: =popup_eliminar_registro
+            Width: =1004
+            X: =181
+            Y: =83
+            ZIndex: =31
+
+        Gallery4_1 As gallery.galleryVertical:
+            Height: =396
+            Items: =col_registro_eliminar_HORAS_SP
+            Layout: =Layout.Vertical
+            TemplateSize: =37
+            Visible: =popup_eliminar_registro
+            Width: =1003
+            X: =181
+            Y: =238
+            ZIndex: =32
+
+            Rectangle1_6 As rectangle:
+                Fill: =If(Label35_1.Text="PENDIENTE",RGBA(255, 191, 0, 0.25),RGBA(100,100,0,0))
+                Height: =37
+                OnSelect: =Select(Parent)
+                Width: =993
+                ZIndex: =1
+
+            Subtitle5_20 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Montaje
+                Width: =63
+                X: =45
+                ZIndex: =2
+
+            Subtitle5_25 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Comentarios
+                Width: =251
+                X: =470
+                ZIndex: =3
+
+            Title7_4 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                FontWeight: =FontWeight.Normal
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.HN
+                Width: =50
+                X: =133
+                ZIndex: =4
+
+            Subtitle5_21 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.HE
+                Width: =50
+                X: =183
+                ZIndex: =5
+
+            Subtitle5_23 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Dieta
+                Width: =50
+                X: =328
+                ZIndex: =6
+
+            Subtitle5_24 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Viajes
+                Width: =50
+                X: =399
+                ZIndex: =7
+
+            Subtitle5_26 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Cod_Ausencias
+                Width: =50
+                X: =721
+                ZIndex: =8
+
+            Subtitle5_27 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Ausencias
+                Width: =50
+                X: =808
+                ZIndex: =9
+
+            Subtitle5_22 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.'Motivo HE'
+                Width: =50
+                X: =247
+                ZIndex: =10
+
+            Separator6_4 As rectangle:
+                Fill: =RGBA(153, 160, 196, 1)
+                Height: =1
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =36
+                ZIndex: =11
+
+            Label35_1 As label:
+                Height: =37
+                OnSelect: =Select(Parent)
+                Size: =10
+                Text: =ThisItem.Fecha
+                Width: =95
+                X: =898
+                ZIndex: =12
+
+            Icon20 As icon.Trash:
+                Color: =RGBA(168, 0, 0, 1)
+                Height: =30
+                Icon: =Icon.Trash
+                OnSelect: |-
+                    =Patch(HORAS_SP,LookUp(HORAS_SP,ThisItem.ID = ID),{APROBACIÓN:"ELIMINADO"});
+                    Remove(col_HORAS_SP_Diario,LookUp(col_HORAS_SP_Diario,ThisItem.ID = ID));
+                    Remove(col_registro_eliminar_HORAS_SP,ThisItem);
+                    If(
+                        CountRows(col_registro_eliminar_HORAS_SP)=0,
+                        UpdateContext({popup_eliminar_registro:false})
+                    );
+                    Set(_Update_Pendiente,true);
+                Visible: |-
+                    =And(
+                        ThisItem.'Creado por'.DisplayName = User().FullName,
+                        Date(Right(ThisItem.Fecha,4),Mid(ThisItem.Fecha,4,2),Left(ThisItem.Fecha,2)) >= _fecha_corte,
+                        ThisItem.APROBACIÓN = "PENDIENTE"
+                    )
+                Width: =34
+                ZIndex: =13
+
+        Button12_1 As button:
+            Height: =38
+            OnSelect: |-
+                =UpdateContext({popup_eliminar_registro:!popup_eliminar_registro})
+            Size: =13
+            Text: ="ACEPTAR"
+            Visible: =popup_eliminar_registro
+            Width: =146
+            X: =608
+            Y: =637
+            ZIndex: =33
+
+        Label36_25 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Montaje"
+            Visible: =popup_eliminar_registro
+            Width: =113
+            X: =226
+            Y: =214
+            ZIndex: =34
+
+        Label36_26 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="HN"
+            Visible: =popup_eliminar_registro
+            Width: =35
+            X: =331
+            Y: =216
+            ZIndex: =35
+
+        Label36_27 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="HE"
+            Visible: =popup_eliminar_registro
+            Width: =35
+            X: =375
+            Y: =216
+            ZIndex: =36
+
+        Label36_28 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Dieta"
+            Visible: =popup_eliminar_registro
+            Width: =56
+            X: =516
+            Y: =216
+            ZIndex: =37
+
+        Label36_29 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Viajes"
+            Visible: =popup_eliminar_registro
+            Width: =56
+            X: =583
+            Y: =216
+            ZIndex: =38
+
+        Label36_30 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Comentario"
+            Visible: =popup_eliminar_registro
+            Width: =292
+            X: =647
+            Y: =216
+            ZIndex: =39
+
+        Label36_31 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Ausencia"
+            Visible: =popup_eliminar_registro
+            Width: =97
+            X: =974
+            Y: =216
+            ZIndex: =40
+
+        Label36_32 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Motivo HE"
+            Visible: =popup_eliminar_registro
+            Width: =97
+            X: =413
+            Y: =216
+            ZIndex: =41
+
+        Label44_1 As label:
+            Color: =RGBA(83, 83, 83, 1)
+            Height: =38
+            Text: =First(col_registro_eliminar_HORAS_SP).Nombre
+            Visible: =popup_eliminar_registro
+            Width: =283
+            X: =218
+            Y: =134
+            ZIndex: =42
+
+        Label45_1 As label:
+            Color: =RGBA(83, 83, 83, 1)
+            Text: =First(col_registro_eliminar_HORAS_SP).Codigo
+            Visible: =popup_eliminar_registro
+            X: =621
+            Y: =133
+            ZIndex: =43
+
+        Label47_1 As label:
+            Height: =32
+            Text: |-
+                ="Nombre:"
+            Visible: =popup_eliminar_registro
+            X: =218
+            Y: =110
+            ZIndex: =44
+
+        Label48_3 As label:
+            Height: =32
+            Text: |-
+                ="Código: "
+            Visible: =popup_eliminar_registro
+            X: =617
+            Y: =110
+            ZIndex: =45
+
+        Label36_24 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Cod. Aus."
+            Visible: =popup_eliminar_registro
+            Width: =97
+            X: =884
+            Y: =216
+            ZIndex: =46
+
+        Separator6_3 As rectangle:
+            Fill: =RGBA(153, 160, 196, 1)
+            Height: =1
+            OnSelect: =
+            Visible: =popup_eliminar_registro
+            Width: =991
+            X: =186
+            Y: =238
+            ZIndex: =47
+
+        Label36_33 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            Size: =11
+            Text: ="Fecha"
+            Visible: =popup_eliminar_registro
+            Width: =87
+            X: =1092
+            Y: =218
+            ZIndex: =48
+

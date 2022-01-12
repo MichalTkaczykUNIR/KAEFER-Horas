@@ -1,0 +1,175 @@
+Portada As screen:
+    BackgroundImage: ='KAEFER-Image-film-20'
+
+    Label30 As label:
+        Align: =Align.Right
+        Height: =23
+        Size: =8
+        Text: ="v0.6.6"
+        VerticalAlign: =VerticalAlign.Bottom
+        Width: =88
+        X: =1273
+        Y: =727
+        ZIndex: =1
+
+    Button19 As button:
+        Height: =29
+        OnSelect: |-
+            =Navigate(Changelog,Fade);
+            Refresh(Changelog_SP)
+        Size: =11
+        Text: =" Ver cambios"
+        Width: =140
+        X: =1170
+        Y: =724
+        ZIndex: =2
+
+    Button4 As button:
+        DisplayMode: =
+        Height: =104
+        OnSelect: |-
+            =If(CountRows(col_LISTAS_IND_SP)>0,
+                Navigate(Horas_Lista, ScreenTransition.Fade),
+                Navigate(Horas, ScreenTransition.Fade)
+            );
+            Set(_fecha_editar,Today())
+        RadiusBottomLeft: =40
+        RadiusBottomRight: =40
+        RadiusTopLeft: =40
+        RadiusTopRight: =40
+        Text: ="ASIGNAR HORAS"
+        Width: =478
+        X: =864
+        Y: =26
+        ZIndex: =3
+
+    Button4_2 As button:
+        DisplayMode: =
+        Height: =104
+        OnSelect: =Navigate(Aprobar, ScreenTransition.Fade);Set(Refreshall,false)
+        RadiusBottomLeft: =40
+        RadiusBottomRight: =40
+        RadiusTopLeft: =40
+        RadiusTopRight: =40
+        Text: ="APROBAR HORAS"
+        Visible: |-
+            =If(Or(Label3_4.Text="Perfil: Administrativo",Label3_4.Text="Perfil: Jefe proyecto"),true,false)
+        Width: =478
+        X: =864
+        Y: =166
+        ZIndex: =4
+
+    Button4_4 As button:
+        DisplayMode: =
+        Height: =104
+        OnSelect: =Navigate(Castilla, ScreenTransition.Fade);Set(Refreshall,false)
+        RadiusBottomLeft: =40
+        RadiusBottomRight: =40
+        RadiusTopLeft: =40
+        RadiusTopRight: =40
+        Text: ="CASTILLA"
+        Visible: |-
+            =Label3_4.Text="Perfil: Administrativo"
+        Width: =478
+        X: =864
+        Y: =306
+        ZIndex: =5
+
+    Image2 As image:
+        Height: =150
+        Image: =User().Image
+        RadiusBottomLeft: =75
+        RadiusBottomRight: =75
+        RadiusTopLeft: =75
+        RadiusTopRight: =75
+        Width: =150
+        X: =142
+        Y: =270
+        ZIndex: =6
+
+    Label40 As label:
+        Align: =Align.Center
+        Color: =RGBA(0, 18, 107, 1)
+        FontWeight: =FontWeight.Bold
+        Height: =64
+        Size: =16
+        Text: =User().Email
+        Width: =400
+        X: =17
+        Y: =420
+        ZIndex: =7
+
+    Label3_4 As label:
+        Align: =Align.Center
+        Color: =RGBA(0, 18, 107, 1)
+        FontWeight: =FontWeight.Bold
+        Height: =100
+        Size: =26
+        Text: |-
+            ="Perfil: "&LookUp(KAEFER_Usuarios,Label40.Text='E-mail',Perfil)
+        Width: =400
+        X: =17
+        Y: =553
+        ZIndex: =8
+
+    Label3_5 As label:
+        Align: =Align.Center
+        Color: =RGBA(0, 18, 107, 1)
+        FontWeight: =FontWeight.Bold
+        Height: =100
+        Size: =26
+        Text: =LookUp(KAEFER_Usuarios,Label40.Text='E-mail',Lugar)
+        Width: =400
+        X: =17
+        Y: =653
+        ZIndex: =9
+
+    Label3 As label:
+        Align: =Align.Center
+        Color: =RGBA(0, 18, 107, 1)
+        FontWeight: =FontWeight.Bold
+        Height: =136
+        Size: =26
+        Text: =LookUp(KAEFER_Usuarios,Label40.Text='E-mail',UdN)
+        Width: =400
+        X: =17
+        Y: =30
+        ZIndex: =11
+
+    Popup_Guardado_4 As group:
+        Height: =5
+        Width: =5
+        X: =80
+        Y: =80
+        ZIndex: =13
+
+        Rectangle2_5 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =Popup_Guardado_Princ
+            Width: =1366
+            ZIndex: =12
+
+        Rectangle3_5 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =296
+            Visible: =Popup_Guardado_Princ
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =13
+
+        Label27_5 As label:
+            Align: =Align.Center
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =149
+            Text: ="Actualizando datos, por favor espere."
+            Visible: =Popup_Guardado_Princ
+            Width: =385
+            X: =530
+            Y: =295
+            ZIndex: =14
+

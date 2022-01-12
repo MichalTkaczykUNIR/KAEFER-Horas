@@ -1,0 +1,229 @@
+Configuracion As screen:
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    ImagePosition: =ImagePosition.Fill
+    OnVisible: |-
+        =UpdateContext({admin_vis:false})
+
+    Rectangle5_2 As rectangle:
+        BorderColor: =RGBA(0, 18, 107, 0.5)
+        BorderThickness: =1
+        Fill: =RGBA(0, 0, 0, 0)
+        Height: =621
+        Width: |
+            =Rectangle5_3.Width
+        X: =929
+        Y: =91
+        ZIndex: =1
+
+    Rectangle5_3 As rectangle:
+        BorderColor: =RGBA(0, 18, 107, 0.5)
+        BorderThickness: =1
+        Fill: =RGBA(0, 0, 0, 0)
+        Height: =621
+        Width: =407
+        X: =479
+        Y: =91
+        ZIndex: =2
+
+    Rectangle5_4 As rectangle:
+        BorderColor: =RGBA(0, 18, 107, 0.5)
+        BorderThickness: =1
+        Fill: =RGBA(0, 0, 0, 0)
+        Height: =621
+        Width: =Rectangle5_3.Width
+        X: =31
+        Y: =91
+        ZIndex: =3
+
+    Image9_10 As image:
+        Height: =45
+        Image: =KAEFER_Logo_Simple
+        Width: =234
+        X: =566
+        Y: =10
+        ZIndex: =4
+
+    Icon3_7 As icon.ChevronLeft:
+        Height: =50
+        Icon: =Icon.ChevronLeft
+        OnSelect: |-
+            =Select(Guardar_cambios_config);
+            Back(Fade)
+            
+                
+        Width: =50
+        Y: =8
+        ZIndex: =5
+
+    Label10_4 As label:
+        FontWeight: =FontWeight.Bold
+        OnSelect: |-
+            =If(
+                User().Email="PujadasEnr@MyKAEFER.com",
+                UpdateContext({admin_vis:!admin_vis})
+            )
+        Text: ="Configuración"
+        Width: =368
+        X: =70
+        Y: =13
+        ZIndex: =6
+
+    Label10_5 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Bold
+        Height: =46
+        Text: ="Castilla"
+        Width: =407
+        X: =929
+        Y: =91
+        ZIndex: =7
+
+    horas_penoso_auto As checkbox:
+        CheckboxSize: =20
+        Default: |-
+            =//horas_penoso_auto
+            If(
+                IsBlank(_configuracion),
+                false,
+                If(
+                    LookUp(_configuracion,variable="horas_penoso_auto",valor) = "true",
+                    true,
+                    false
+                )
+            )
+        Height: =24
+        Size: =10
+        Text: ="Horas penoso por defecto"
+        Width: =213
+        X: =948
+        Y: =170
+        ZIndex: =8
+
+    Guardar_cambios_config As icon.Save:
+        Height: =39
+        Icon: =Icon.Save
+        OnSelect: |-
+            =Patch(
+                KAEFER_Usuarios,
+                LookUp(
+                    KAEFER_Usuarios,
+                    User().Email = 'E-mail'
+                ),
+                {
+                    //Horas_Penoso
+                    KAEFER_Horas_Settings: If(
+                        horas_penoso_auto.Value,
+                        "horas_penoso_auto:true;",
+                        "horas_penoso_auto:false;"
+                    ) &
+                    //lugar_predeterminado
+                    "lugar_predeterminado:" & lugar_predeterminado.SelectedText.Value & ";"
+                }
+            );
+            
+            //Actualizo los cambios en la variable local
+            Set(_configuracion,
+                AddColumns(Split(LookUp(KAEFER_Usuarios,User().Email='E-mail',KAEFER_Horas_Settings),";"),
+                "variable",First(Split(Result,":")).Result,
+                "valor",Last(FirstN(Split(Result,":").Result,2)).Result)
+            );
+        Visible: =admin_vis
+        Width: =42
+        X: =1159
+        Y: =16
+        ZIndex: =9
+
+    lugar_predeterminado As dropdown:
+        Default: |-
+            =//lugar_predeterminado
+            If(
+                IsBlank(_configuracion),
+                "",
+                LookUp(_configuracion,variable="lugar_predeterminado",valor)
+            )
+        Height: =28
+        Items: =["","ARRIGORRIAGA","ASTURIAS","CÁDIZ","CARTAGENA","CORUÑA","ERANDIO","HUELVA","PROYECTOS SINGULARES","PUERTOLLANO","SEVILLA","TALLER","TARRAGONA"]
+        Size: =10
+        Width: =200
+        X: =948
+        Y: =239
+        ZIndex: =10
+
+    Label67 As label:
+        Height: =26
+        Size: =10
+        Text: |-
+            ="Lugar predeterminado:"
+        Width: =200
+        X: =948
+        Y: =213
+        ZIndex: =11
+
+    DataTable1 As dataTable.datatable:
+        BorderStyle: =BorderStyle.Solid
+        DisplayMode: =DisplayMode.Edit
+        Fill: =RGBA(0, 0, 0, 0)
+        Height: =453
+        Items: =_configuracion
+        Visible: =admin_vis
+        Width: =260
+        X: =70
+        Y: =213
+        ZIndex: =12
+
+        Result_Columna1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Result"
+            FieldName: ="Result"
+            FieldVariantName: ="textualColumn"
+            Height: =399
+            LayoutHeight: =Parent.Height
+            Order: =1
+            Text: =ThisItem.valor
+            Visible: =admin_vis
+            Width: =254
+            X: =5
+            Y: =0
+            ZIndex: =1
+
+    Label72 As label:
+        Height: =28
+        Size: =9
+        Text: =LookUp(_configuracion,variable="lugar_predeterminado",valor)
+        Visible: =admin_vis
+        Width: =104
+        X: =1232
+        Y: =239
+        ZIndex: =13
+
+    Label72_1 As label:
+        Height: =25
+        Size: =9
+        Text: =LookUp(_configuracion,variable="horas_penoso_auto",valor)
+        Visible: =admin_vis
+        Width: =104
+        X: =1232
+        Y: =169
+        ZIndex: =14
+
+    Label10_6 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Bold
+        Height: =46
+        Text: ="Aprobar Horas"
+        Width: =406
+        X: =480
+        Y: =91
+        ZIndex: =15
+
+    Label10_7 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Bold
+        Height: =46
+        Text: ="Asignar Horas"
+        Width: =406
+        X: =32
+        Y: =91
+        ZIndex: =16
+

@@ -1,0 +1,20 @@
+Comprobacion_BI As screen:
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    ImagePosition: =ImagePosition.Fill
+    OnVisible: =
+
+    PowerBI1 As powerbi:
+        Height: =768
+        TileUrl: |-
+            ="https://app.powerbi.com/reportEmbed?reportId=3aa3014e-529e-464f-a03d-44b99206c099&groupId=c1db7825-6b9c-4e2b-b191-c647657b6f0d&autoAuth=true&ctid=a4ba9a94-480c-403e-9e4a-c525a09ec965&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLW5vcnRoLWV1cm9wZS1nLXByaW1hcnktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQvIn0%3D"
+        Width: =1366
+        WorkspaceId: ="c1db7825-6b9c-4e2b-b191-c647657b6f0d"
+        ZIndex: =2
+
+    Icon10_2 As icon.ChevronLeft:
+        Height: =50
+        Icon: =Icon.ChevronLeft
+        OnSelect: =Back(Fade)
+        Width: =50
+        ZIndex: =3
+

@@ -1,0 +1,122 @@
+App As appinfo:
+    BackEnabled: =false
+    OnStart: |-
+        =Set(Refreshall,true);
+        Set(Popup_Guardado_Princ,true);
+        Set(_ver_comprobacion,false);
+        Set(_Update_Pendiente,true);
+        
+        //Creo la tabla de configuracion
+        Set(_configuracion,
+            AddColumns(Split(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,KAEFER_Horas_Settings),";"),
+            "variable",First(Split(Result,":")).Result,
+            "valor",Last(FirstN(Split(Result,":").Result,2)).Result)
+        );
+        
+        Set(Lugares,
+            Distinct(
+            //  Filter(
+                    KAEFER_Usuarios,
+            //      UdN = LookUp(KAEFER_Usuarios;Label40.Text = 'E-mail';UdN)
+            //  );
+                Lugar
+            )
+        );
+        Concurrent(
+            ClearCollect(col_SAP_Operarios_Activos,SAP_Operarios_Activos),
+            ClearCollect(col_SAP_Montajes,SAP_Montajes),
+            ClearCollect(col_Conceptos_Partes,'Conceptos partes'), 
+            //Agrego columnas extras para crear variables a nivel de galería
+            ClearCollect(
+                col_LISTAS_IND_SP,
+                Filter(LISTAS_IND_SP,Responsable = User().Email)
+            )
+        );
+        Collect(
+            col_SAP_Montajes,
+            {
+                Proyecto: "99999",
+                Name: "Pruebas"
+            }
+        );
+        Collect(
+            col_SAP_Montajes,
+            {
+                Proyecto: "7777777",
+                Name: "Improductivos"
+            }
+        );
+        
+        //Agrego índice de WeekNum y WeekName
+        ClearCollect(
+            Dias_semana,
+            Table(
+                {Dia: "Lunes",Codigo: 2},
+                {Dia: "Martes",Codigo: 3},
+                {Dia: "Miércoles",Codigo: 4},
+                {Dia: "Jueves",Codigo: 5},
+                {Dia: "Viernes",Codigo: 6},
+                {Dia: "Sábado",Codigo: 7},
+                {Dia: "Domingo",Codigo: 1}
+            )
+        );
+        
+        Set(//Defino última fecha en la que puedo agregar horas, semana
+            _fecha_corte_semana,
+            If(
+                Weekday(Today()) = 2,
+                Today() - 7,
+                If(
+                    Weekday(Today()) = 3,
+                    Today() - 8,
+                    If(
+                        Weekday(Today()) = 4,
+                        Today() - 9,
+                        If(
+                            Weekday(Today()) = 5,
+                            Today() - 3,
+                            If(
+                                Weekday(Today()) = 6,
+                                Today() - 4,
+                                If(
+                                    Weekday(Today()) = 7,
+                                    Today() - 5,
+                                    If(
+                                        Weekday(Today()) = 1,
+                                        Today() - 6
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+        
+        /*
+        Set(//Defino última fecha en la que puedo agregar horas, mes
+            _fecha_corte_mes;
+            Date(Year(Today());Month(Today()-1);2)
+        );;
+        */
+        
+        //ELIMINAR ELIMINAR ELIMINAR ELIMINAR ELIMINAR
+        If(
+            Today() > Date(2021,12,9),
+            Set(_fecha_corte_semana, Date(2021,12,6)),
+            Set(_fecha_corte_semana, Date(2021,11,29))
+        );
+        //ELIMINAR ELIMINAR ELIMINAR ELIMINAR ELIMINAR
+        
+        Set(//Defino fecha de corte
+            _fecha_corte,
+            If(
+            true,//_fecha_corte_semana > _fecha_corte_mes;
+            _fecha_corte_semana,
+            Date(2020,1,1)//_fecha_corte_mes
+            )
+        );
+        
+        Patch(col_HORAS_SP,Defaults(HORAS_SP),{UdN:""});
+        Set(Popup_Guardado_Princ,false);
+

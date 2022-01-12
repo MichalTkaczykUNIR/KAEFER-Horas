@@ -1,0 +1,958 @@
+Aprobar As screen:
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    ImagePosition: =ImagePosition.Fill
+    OnVisible: |-
+        =ClearCollect(
+            col_HORAS_SP,
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        APROBACIÓN = "PENDIENTE",
+                        APROBACIÓN = "A VERIFICAR"
+                    )
+                )
+            // Filtro de _fecha_corte
+            // Date(Value(Right(Fecha;4));Value(Mid(Fecha;4;2));Value(Left(Fecha;2))) >= _fecha_corte
+        );
+        Patch(col_HORAS_SP,Defaults(HORAS_SP),{UdN:""});
+
+    Toggle8 As toggleSwitch:
+        FalseText: ="Creador"
+        Height: =23
+        TrueText: ="Creador"
+        Width: =144
+        X: =892
+        Y: =59
+        ZIndex: =1
+
+    Button5_3 As button:
+        Height: =50
+        OnSelect: |-
+            =UpdateContext({popup_guardado: true});
+            //Guardo localmente los cambios a efectuar
+            ForAll(
+                Gallery2.AllItems,
+                If(
+                    ThisRecord.Checkbox1.Value = true,
+                    Collect(
+                        col_HORAS_SP_ACTUALIZACION,
+                        {
+                            ID_Actualizar: Value(ID),
+                            APROBACIÓN: "APROBADO",
+                            Comentarios: TextInput11.Text,
+                            'Aprobado por': User().Email
+                        }
+                    )
+                )
+            );
+            UpdateContext({cant_registros_nuevos: CountRows(col_HORAS_SP_ACTUALIZACION)});
+            //Actualizo la lista de HORAS_SP de sharepoint
+            ForAll(
+                col_HORAS_SP_ACTUALIZACION,
+                    Patch(
+                        HORAS_SP,
+                        LookUp(col_HORAS_SP,col_HORAS_SP[@ID] =ID_Actualizar),
+                        {
+                            APROBACIÓN: ThisRecord.APROBACIÓN,
+                            Comentarios: ThisRecord.Comentarios,
+                            'Aprobado por':ThisRecord.'Aprobado por'               
+                        }
+                    );
+                    Patch(ThisRecord,
+                        {
+                            ID_Actualizar: ThisRecord.ID_Actualizar
+                        }
+                    );
+            );
+            UpdateContext({cant_registros_guardados: CountRows(col_HORAS_SP_ACTUALIZACION)});
+            //Verifico si hubieron errores
+            If(
+                IsEmpty(Errors(HORAS_SP)),
+                Clear(col_HORAS_SP_ACTUALIZACION);
+                Clear(temp);
+                If(
+                    CountRows(Gallery2.AllItems)>cant_registros_guardados,
+                    Notify(
+                        "Se aprobaron " & cant_registros_guardados & " registros nuevos, quedaron pendientes de aprobar "&CountRows(Gallery2.AllItems)-cant_registros_guardados&". 
+            Por favor repita el proceso visualizando todos los registros para aprobar los faltantes.",
+                        Error,
+                        10000
+                    ),
+                    Notify(
+                        "Se aprobaron " & cant_registros_guardados & " registros nuevos",
+                        Success,
+                        2000
+                    )
+                ),
+                Notify(
+                    "Error al aprobar " & cant_registros_nuevos - cant_registros_guardados & "registro/s de HORAS_SP, reintentar nuevamente más tarde",
+                    NotificationType.Error,
+                    5000
+                )
+            );
+            UpdateContext(
+                {
+                    popup_guardado: false,
+                    form_reset: true
+                }
+            );
+            //Actualizo Horas local
+            ClearCollect(
+                col_HORAS_SP,
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        APROBACIÓN = "PENDIENTE",
+                        APROBACIÓN = "A VERIFICAR"
+                    )
+                )
+            );
+            UpdateContext({form_reset: false});
+            Set(_Update_Pendiente,true)
+        RadiusBottomLeft: =40
+        RadiusBottomRight: =40
+        RadiusTopLeft: =40
+        RadiusTopRight: =40
+        Text: ="APROBAR HORAS"
+        Width: =300
+        X: =552
+        Y: =705
+        ZIndex: =2
+
+    Icon3_2 As icon.ChevronLeft:
+        Height: =50
+        Icon: =Icon.ChevronLeft
+        OnSelect: =Navigate(Portada, ScreenTransition.Fade)
+        Width: =50
+        Y: =8
+        ZIndex: =3
+
+    TextInput9_2 As text:
+        Default: =""
+        DelayOutput: =true
+        Height: =34
+        HintText: ="Buscar Nombre"
+        Width: =196
+        X: =202
+        Y: =54
+        ZIndex: =4
+
+    TextInput9_3 As text:
+        Default: =""
+        DelayOutput: =true
+        Height: =34
+        HintText: ="Montaje"
+        Width: =99
+        X: =414
+        Y: =54
+        ZIndex: =5
+
+    "Gallery2 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Height: =601
+        Items: |-
+            =Sort(
+                Sort(
+                    Filter(
+                        col_HORAS_SP,
+                        //Filtro de _fecha_corte
+                        //Date(Value(Right(Fecha;4));Value(Mid(Fecha;4;2));Value(Left(Fecha;2))) >= _fecha_corte;
+                        Or(
+                            APROBACIÓN = "PENDIENTE",
+                            APROBACIÓN = "A VERIFICAR"
+                        ),
+                        TextInput9_3.Text in Montaje,
+                        //Filtro de Nombre
+                        If(
+                            IsBlank(TextInput9_2),
+                            true,
+                            TextInput9_2.Text in Nombre
+                        ),
+                        //Filtro de Código
+                        If(
+                            IsBlank(TextInput9_4),
+                            true,
+                            TextInput9_4.Text in Codigo
+                        ),
+                        //Filtro de UdN
+                        If(
+                            IsBlank(Dropdown3.SelectedText.Value),
+                            true,
+                            UdN in Dropdown3.SelectedText.Value
+                        ),
+                        //Filtro de fecha
+                        If(
+                            Toggle4.Value,
+                            Text(
+                                DatePicker3.SelectedDate,
+                                "[$-es]dd/mm/yyyy"
+                            ) = Fecha,
+                            true
+                        ),
+                        //Filtro de solo correctas
+                        If(
+                            Toggle5.Value,
+                            And(
+                                !(RoundDown(
+                                    Horas_Fichadas - HN - HE,
+                                    0
+                                ) < -1),
+                                IsBlank(Comentarios),
+                                !(Horas_Fichadas = "N/A")
+                            ),
+                            true
+                        ),
+                        //Filtro de creador
+                        If(
+                            Toggle8.Value,
+                            Dropdown11.SelectedText.'data-ADB4D7A662F548B49FAC2B986E348A1BResult' = 'Creado por'.DisplayName,
+                            true
+                        )
+                    ),
+                    Date(Value(Right(Fecha,4)),Value(Mid(Fecha,4,2)),Value(Left(Fecha,2))),
+                    Ascending
+                ),
+                Value(Codigo),
+                Ascending
+            )
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =114
+        Width: =1366
+        Y: =94
+        ZIndex: =6
+
+        Image3 As image:
+            Height: =79
+            Image: |-
+                ="https://www.codigos-qr.com/qr/php/qr_img.php?d="&ThisItem.Codigo
+            OnSelect: =Select(Parent)
+            Width: =105
+            X: =67
+            Y: =28
+            ZIndex: =1
+
+        Title2 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =15
+            Text: =ThisItem.Nombre
+            VerticalAlign: =VerticalAlign.Top
+            Width: =500
+            X: =205
+            Y: =8
+            ZIndex: =2
+
+        Subtitle2 As label:
+            Height: =19
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =13
+            Text: =ThisItem.Fecha
+            VerticalAlign: =VerticalAlign.Top
+            Width: =125
+            X: =1157
+            Y: =11
+            ZIndex: =3
+
+        Separator2 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+        Subtitle2_6 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =15
+            Text: |-
+                ="Montaje: "&ThisItem.Montaje
+            VerticalAlign: =VerticalAlign.Top
+            Width: =250
+            X: =705
+            Y: =7
+            ZIndex: =11
+
+        Group6 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =11
+
+            Subtitle2_1 As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =15
+                Text: |-
+                    ="HN: "&ThisItem.HN
+                VerticalAlign: =VerticalAlign.Top
+                X: =204
+                Y: =40
+                ZIndex: =6
+
+            Subtitle2_2 As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =15
+                Text: |-
+                    ="HE: "&ThisItem.HE
+                VerticalAlign: =VerticalAlign.Top
+                Visible: =!IsBlank(ThisItem.HE)
+                X: =204
+                Y: =72
+                ZIndex: =7
+
+            Subtitle2_3 As label:
+                Height: =60
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =15
+                Text: |-
+                    ="Dietas: "&If(ThisItem.Dieta="207","Completa",If(ThisItem.Dieta="208","Salida (Media)"))
+                VerticalAlign: =VerticalAlign.Top
+                Visible: =!IsBlank(ThisItem.Dieta)
+                Width: =175
+                X: =354
+                Y: =40
+                ZIndex: =8
+
+            Subtitle2_5 As label:
+                Height: =31
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =15
+                Text: |-
+                    ="Comentarios: "
+                VerticalAlign: =VerticalAlign.Top
+                Width: =163
+                X: =542
+                Y: =41
+                ZIndex: =10
+
+        Title2_1 As label:
+            Align: =Align.Center
+            Height: =19
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =13
+            Text: =ThisItem.Codigo
+            VerticalAlign: =VerticalAlign.Top
+            Width: =105
+            X: =67
+            Y: =6
+            ZIndex: =12
+
+        Icon4 As icon.Trash:
+            Height: =50
+            Icon: =Icon.Trash
+            OnSelect: |
+                =Patch(HORAS_SP,LookUp(HORAS_SP,ThisItem.ID = ID),{APROBACIÓN:"ELIMINADO"});
+                Remove(col_HORAS_SP,ThisItem);
+            Width: =44
+            X: =23
+            Y: =29
+            ZIndex: =13
+
+        TextInput11 As text:
+            Default: =ThisItem.Comentarios
+            Height: =36
+            OnSelect: =Select(Parent)
+            Size: =10
+            Width: =433
+            X: =705
+            Y: =40
+            ZIndex: =14
+
+        Checkbox1 As checkbox:
+            CheckboxSize: =50
+            Default: =true
+            Height: =62
+            OnSelect: =Select(Parent)
+            Text: =""
+            Width: =52
+            X: =1302
+            Y: =25
+            ZIndex: =15
+
+        Label28_1 As label:
+            Align: =Align.Center
+            BorderThickness: =1
+            Fill: =If(Len(Text(ThisItem.Ausencias))>0,RGBA(0, 255, 50, 0.3),RGBA(0, 0, 0, 0))
+            FontWeight: =FontWeight.Semibold
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: =LookUp(col_Conceptos_Partes,Title=ThisItem.Cod_Ausencias,Concepto)
+            Width: =300
+            X: =788
+            Y: =77
+            ZIndex: =17
+
+        Label28_2 As label:
+            Align: =Align.Center
+            BorderThickness: =1
+            Fill: =If(Len(Text(ThisItem.Ausencias))>0,RGBA(0, 255, 50, 0.3),RGBA(0, 0, 0, 0))
+            FontWeight: =FontWeight.Semibold
+            Height: =30
+            OnSelect: =Select(Parent)
+            Text: =ThisItem.Ausencias
+            Width: =50
+            X: =1088
+            Y: =77
+            ZIndex: =18
+
+        Label28_3 As label:
+            Align: =Align.Center
+            BorderThickness: =1
+            Fill: =If(Len(Text(ThisItem.Ausencias))>0,RGBA(0, 255, 50, 0.3),RGBA(0, 0, 0, 0))
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: |-
+                ="Ausencias:"
+            Width: =83
+            X: =705
+            Y: =77
+            ZIndex: =19
+
+        Rectangle1_2 As rectangle:
+            Fill: |-
+                =If(ThisItem.Horas_Fichadas="N/A",
+                    RGBA(0, 18, 107, 1),
+                    If(!IsBlank(ThisItem.Comentarios),
+                        RGBA(0, 18, 107, 1),
+                        If(Abs(RoundDown(Value(ThisItem.Horas_Fichadas-ThisItem.HN-ThisItem.HE),0))<=1,
+                            RGBA(54, 176, 75, 1),
+                            If(RoundDown(Value(ThisItem.Horas_Fichadas-ThisItem.HN-ThisItem.HE),0)>1,
+                                RGBA(255, 229, 0, 1),
+                                If(RoundDown(Value(ThisItem.Horas_Fichadas-ThisItem.HN-ThisItem.HE),0)<1,
+                                    RGBA(224, 22, 0, 1)
+                                )
+                            )
+                        )
+                    )
+                )
+            Height: =114
+            OnSelect: =Select(Parent)
+            Width: =10
+            ZIndex: =20
+
+        Label20 As label:
+            Height: =37
+            OnSelect: =Select(Parent)
+            Size: =12
+            Text: |-
+                ="Horas Fichaje: "& If(IsBlank(ThisItem.Horas_Fichadas),"0",ThisItem.Horas_Fichadas)
+            Width: =175
+            X: =542
+            Y: =73
+            ZIndex: =21
+
+        ID_reg As label:
+            Height: =32
+            OnSelect: =Select(Parent)
+            Text: =ThisItem.ID
+            Visible: =false
+            Width: =57
+            X: =1268
+            Y: =47
+            ZIndex: =22
+
+        Subtitle2_4 As label:
+            Height: =19
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =13
+            Text: =ThisItem.UdN
+            VerticalAlign: =VerticalAlign.Top
+            Width: =125
+            X: =1157
+            Y: =83
+            ZIndex: =23
+
+    Label13 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =34
+        Text: |-
+            ="Registros: "&CountRows(Gallery2.AllItems)
+        Tooltip: =false
+        X: =735
+        Y: =54
+        ZIndex: =7
+
+    DataTable2 As dataTable.datatable:
+        BorderStyle: =BorderStyle.Solid
+        DisplayMode: =DisplayMode.Edit
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =601
+        Items: =Sort(Gallery2.AllItems,Value(Codigo),Ascending)
+        Visible: =Widok
+        Width: =1366
+        X: =0
+        Y: =94
+        ZIndex: =8
+
+        Codigo_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Codigo"
+            FieldName: ="Codigo"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =3
+            Text: =ThisItem.Codigo
+            Width: =81
+            X: =0
+            Y: =0
+            ZIndex: =13
+
+        Comentarios_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Comentarios"
+            FieldName: ="Comentarios"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =10
+            Text: =ThisItem.Comentarios
+            Width: =311
+            X: =0
+            Y: =0
+            ZIndex: =14
+
+        Dieta_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Dieta"
+            FieldName: ="Dieta"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =8
+            Text: =ThisItem.Dieta
+            Width: =62
+            X: =0
+            Y: =0
+            ZIndex: =15
+
+        Fecha_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Fecha"
+            FieldName: ="Fecha"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =5
+            Text: =ThisItem.Fecha
+            Width: =117
+            X: =0
+            Y: =0
+            ZIndex: =16
+
+        HE_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="HE"
+            FieldName: ="HE"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =7
+            Text: =ThisItem.HE
+            Width: =61
+            X: =0
+            Y: =0
+            ZIndex: =17
+
+        HN_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="HN"
+            FieldName: ="HN"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =6
+            Text: =ThisItem.HN
+            Width: =65
+            X: =0
+            Y: =0
+            ZIndex: =18
+
+        Montaje_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Montaje"
+            FieldName: ="Montaje"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =4
+            Text: =ThisItem.Montaje
+            Width: =92
+            X: =0
+            Y: =0
+            ZIndex: =19
+
+        Nombre_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Nombre"
+            FieldName: ="Nombre"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =2
+            Text: =ThisItem.Nombre
+            Width: =357
+            X: =0
+            Y: =0
+            ZIndex: =20
+
+        Viajes_Columna2 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Viajes"
+            FieldName: ="Viajes"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =9
+            Text: =ThisItem.Viajes
+            Width: =90
+            X: =0
+            Y: =0
+            ZIndex: =22
+
+        Aprobacion As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Aprobacion"
+            FieldName: ="APROBACI_x00d3_N"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =11
+            Text: =ThisItem.APROBACIÓN
+            Width: =129
+            X: =0
+            Y: =0
+            ZIndex: =24
+
+    Toggle1 As toggleSwitch:
+        FalseText: ="Galería"
+        Height: =35
+        OnCheck: =Set(Widok,true)
+        OnUncheck: =Set(Widok,false)
+        TrueText: ="Tabla"
+        Width: =184
+        X: =50
+        Y: =720
+        ZIndex: =9
+
+    Toggle4 As toggleSwitch:
+        FalseText: ="Fecha"
+        Height: =23
+        TrueText: ="Fecha"
+        Width: =144
+        X: =892
+        Y: =16
+        ZIndex: =10
+
+    DatePicker3 As datepicker:
+        Height: =34
+        OnChange: |-
+            =/*
+            If(
+                Self.SelectedDate < _fecha_corte;
+                UpdateContext({reset_date: true});;
+                UpdateContext({reset_date: false});;
+                Notify("El día que seleccionó se encuentra bloqueado para aprobar horas, seleccione una fecha posterior al "&_fecha_corte&", gracias.";NotificationType.Error;5000)
+            )
+            */
+        Reset: |-
+            =//reset_date
+            //Habilitada la aprobación de horas fuera de fecha
+        StartOfWeek: =StartOfWeek.Monday
+        Visible: =Toggle4.Value
+        Width: =196
+        X: =1048
+        Y: =10
+        ZIndex: =11
+
+    Toggle5 As toggleSwitch:
+        FalseText: ="Solo Correctos"
+        Height: =26
+        TrueText: ="Solo Correctos"
+        Width: =196
+        X: =295
+        Y: =12
+        ZIndex: =12
+
+    Icon13 As icon.Cancel:
+        Height: =50
+        Icon: =Icon.Information
+        OnSelect: |-
+            =UpdateContext({popup_info:true})
+        Width: =45
+        X: =1294
+        Y: =8
+        ZIndex: =13
+
+    Dropdown11 As dropdown:
+        Height: =34
+        Items: =Distinct(Filter(col_HORAS_SP,APROBACIÓN="PENDIENTE"),'Creado por'.DisplayName)
+        Visible: =Toggle8.Value
+        Width: =196
+        X: =1048
+        Y: =54
+        ZIndex: =14
+
+    Button9_1 As button:
+        Fill: =RGBA(184, 0, 0, 1)
+        Height: =39
+        HoverFill: =ColorFade(RGBA(184, 0, 0, 1), -20%)
+        OnSelect: =Navigate(Verificar,Fade)
+        Size: =10
+        Text: ="Tiene horas pendientes de verificar"
+        Visible: =!IsEmpty(Filter(HORAS_SP,'Aprobado por'=User().Email,APROBACIÓN="A VERIFICAR"))
+        Width: =196
+        X: =72
+        Y: =6
+        ZIndex: =15
+
+    Dropdown3 As dropdown:
+        Default: =Label3.Text
+        Height: =34
+        Items: =Distinct(col_HORAS_SP,UdN)
+        Width: =198
+        X: =530
+        Y: =54
+        ZIndex: =16
+
+    Image9_2 As image:
+        Height: =40
+        Image: =KAEFER_Logo_Simple
+        Width: =234
+        X: =566
+        Y: =5
+        ZIndex: =17
+
+    TextInput9_4 As text:
+        Default: =""
+        DelayOutput: =true
+        Height: =34
+        HintText: ="Buscar Código"
+        Width: =136
+        X: =50
+        Y: =54
+        ZIndex: =18
+
+    popup_info As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =31
+
+        Rectangle2_6 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_info
+            Width: =1366
+            ZIndex: =19
+
+        Rectangle3_6 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =501
+            Visible: =popup_info
+            Width: =615
+            X: =409
+            Y: =123
+            ZIndex: =20
+
+        Label27_6 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =45
+            Text: |-
+                ="Leyenda:"
+            Visible: =popup_info
+            Width: =550
+            X: =441
+            Y: =140
+            ZIndex: =21
+
+        Button6 As button:
+            OnSelect: |-
+                =UpdateContext({popup_info:false})
+            Text: ="Aceptar"
+            Visible: =popup_info
+            X: =636
+            Y: =539
+            ZIndex: =22
+
+        Circle1 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =468
+            Y: =185
+            ZIndex: =23
+
+        Circle1_1 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(54, 176, 75, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =468
+            Y: =235
+            ZIndex: =24
+
+        Circle1_2 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 229, 0, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =468
+            Y: =285
+            ZIndex: =25
+
+        Circle1_3 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(224, 22, 0, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =468
+            Y: =335
+            ZIndex: =26
+
+        Label33 As label:
+            Height: =176
+            LineHeight: =2.9
+            Text: |-
+                ="Registro con comentario o creado sin fichaje
+                Horas fichadas y asignadas concuerdan
+                Horas fichadas mayores a asignadas
+                Horas fichadas menores a asignadas"
+            Visible: =popup_info
+            Width: =453
+            X: =503
+            Y: =185
+            ZIndex: =27
+
+        Button7_9 As button:
+            OnSelect: |-
+                =Navigate(Comprobacion_BI, ScreenTransition.Fade);
+                UpdateContext({popup_info:false})
+            Text: ="ABRIR COMPROBACIÓN BI"
+            Visible: =popup_info
+            Width: =271
+            X: =580
+            Y: =442
+            ZIndex: =28
+
+    Popup_Guardado_2 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =34
+
+        Rectangle2_3 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_guardado
+            Width: =1366
+            ZIndex: =29
+
+        Rectangle3_3 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =296
+            Visible: =popup_guardado
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =30
+
+        Label27_3 As label:
+            Align: =Align.Center
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =76
+            Text: ="Aprobando "&cant_registros_nuevos&" registros, por favor espere."
+            Visible: =popup_guardado
+            Width: =385
+            X: =530
+            Y: =250
+            ZIndex: =31
+
+        Label27_23 As label:
+            Align: =Align.Center
+            Color: =RGBA(168, 0, 0, 1)
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =135
+            Text: |-
+                ="Quedaron pendientes de aprobar "&CountRows(Gallery2.AllItems)-cant_registros_nuevos&" registros.
+                 
+                Por favor repita el proceso visualizando todos los registros para aprobar los faltantes."
+            Visible: |-
+                =And(
+                    popup_guardado,
+                    CountRows(Gallery2.AllItems)-cant_registros_nuevos > 0
+                )
+            Width: =453
+            X: =503
+            Y: =326
+            ZIndex: =33
+

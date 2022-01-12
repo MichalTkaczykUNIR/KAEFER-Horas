@@ -1,0 +1,1567 @@
+Castilla As screen:
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    ImagePosition: =ImagePosition.Fill
+    OnVisible: |-
+        =UpdateContext({reset_form_all: true});
+        UpdateContext(
+            {
+                reset_form_all: false,
+                filtro_codigo: "",
+                filtro_fecha: "",
+                filtro_montaje: ""
+            }
+        );
+        ClearCollect(
+            col_HORAS_SP,
+            Filter(
+                HORAS_SP,
+                APROBACIÓN = "APROBADO"
+            )
+        )
+
+    Image9_4 As image:
+        Height: =45
+        Image: =KAEFER_Logo_Simple
+        Width: =234
+        X: =566
+        Y: =5
+        ZIndex: =1
+
+    Rectangle7 As rectangle:
+        Fill: =RGBA(168, 0, 0, 1)
+        Height: =30
+        Visible: =IsBlank(Dropdown9.SelectedText.Value)
+        Width: =206
+        X: =979
+        Y: =41
+        ZIndex: =2
+
+    "Gallery5 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Height: =674
+        Items: |-
+            =Sort(
+                Sort(
+                    Filter(
+                        col_HORAS_SP,
+                        TextInput4.Text in Montaje,
+                        TextInput4_1.Text in Codigo,
+                        TextInput4_2.Text in Fecha,
+                        //Filtro por comentarios
+                        If(
+                            Checkbox4.Value,
+                            !IsBlank(Comentarios),
+                            true
+                        ),
+                        //Filtro de UdN
+                        If(
+                            !IsBlank(ComboBox4_1.Selected.UdN),
+                            UdN in ComboBox4_1.Selected.UdN,
+                            true
+                        ),
+                        APROBACIÓN = "APROBADO"
+                    ),
+                    Fecha,
+                    Ascending
+                ),
+                Value(Codigo),
+                Ascending
+            )
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =140
+        Width: =1366
+        Y: =94
+        ZIndex: =3
+
+        Rectangle10 As rectangle:
+            Fill: =RGBA(0, 400,200, 0.2)
+            Height: =136
+            OnSelect: =Select(Parent)
+            Visible: =ThisItem.Horas_Fichadas="DUPLICADO"
+            Width: =1366
+            Y: =4
+            ZIndex: =1
+
+        Image4 As image:
+            Height: =24
+            Image: =ThisItem.Foto
+            OnSelect: =Select(Parent)
+            Width: =35
+            Y: =4
+            ZIndex: =2
+
+        Title4 As label:
+            Height: =50
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Nombre
+            Width: =225
+            X: =35
+            Y: =5
+            ZIndex: =3
+
+        Separator4 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =4
+
+        Subtitle4_1 As label:
+            Align: =Align.Center
+            Height: =20
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =14
+            Text: =ThisItem.Fecha
+            VerticalAlign: =VerticalAlign.Top
+            Width: =142
+            X: =57
+            Y: =113
+            ZIndex: =5
+
+        TextInput5 As text:
+            Align: =Align.Center
+            Default: |
+                =ThisItem.HN
+            Height: =30
+            HintText: =If(Or(Weekday(Date(Value(Right(Subtitle4_1.Text,4)),Value(Mid(Subtitle4_1.Text,4,2)),Value(Left(Subtitle4_1.Text,2))))=7,Weekday(Date(Value(Right(Subtitle4_1.Text,4)),Value(Mid(Subtitle4_1.Text,4,2)),Value(Left(Subtitle4_1.Text,2))))=1),"",ThisItem.HN)
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =356
+            Y: =5
+            ZIndex: =6
+
+        TextInput5_1 As text:
+            Align: =Align.Center
+            Default: =ThisItem.HE
+            Height: =30
+            HintText: =If(Or(Weekday(Date(Value(Right(Subtitle4_1.Text,4)),Value(Mid(Subtitle4_1.Text,4,2)),Value(Left(Subtitle4_1.Text,2))))=7,Weekday(Date(Value(Right(Subtitle4_1.Text,4)),Value(Mid(Subtitle4_1.Text,4,2)),Value(Left(Subtitle4_1.Text,2))))=1),"",ThisItem.HE)
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =356
+            Y: =35
+            ZIndex: =7
+
+        TextInput5_2 As text:
+            Align: =Align.Center
+            Default: =If(IsBlank(ThisItem.Dieta),"",1)
+            Height: =30
+            HintText: =If(IsBlank(ThisItem.Dieta),"",1)
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =356
+            Y: =65
+            ZIndex: =8
+
+        TextInput5_3 As text:
+            Align: =Align.Center
+            Default: =ThisItem.Viajes
+            Height: =30
+            HintText: =ThisItem.Viajes
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =356
+            Y: =95
+            ZIndex: =9
+
+        Subtitle4_2 As label:
+            Align: =Align.Center
+            Height: |
+                =20
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =14
+            Text: |
+                =If(
+                    Len(ThisItem.Codigo)=6,
+                    Text(ThisItem.Codigo),
+                        If(
+                            Len(ThisItem.Codigo)=5,
+                            "0"&Text(ThisItem.Codigo),
+                                If(
+                                    Len(ThisItem.Codigo)=4,
+                                    "00"&Text(ThisItem.Codigo),
+                                        If(
+                                            Len(ThisItem.Codigo)=3,
+                                            "000"&Text(ThisItem.Codigo),
+                                                If(
+                                                    Len(ThisItem.Codigo)=2,
+                                                    "0000"&Text(ThisItem.Codigo),
+                                                        If(
+                                                            Len(ThisItem.Codigo)=1,
+                                                            "00000"&Text(ThisItem.Codigo)
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+            VerticalAlign: =VerticalAlign.Top
+            Width: =144
+            X: =56
+            Y: =55
+            ZIndex: =10
+
+        Label4 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="200"
+            Width: =50
+            X: =306
+            Y: =5
+            ZIndex: =11
+
+        Label4_2 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="208"
+            Width: =50
+            X: =306
+            Y: =65
+            ZIndex: =12
+
+        Label4_3 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="211"
+            Width: =50
+            X: =306
+            Y: =95
+            ZIndex: =13
+
+        Dropdown8 As dropdown:
+            Default: |-
+                =If(
+                    horas_penoso_auto,
+                    "202 - HORAS PENOSO",
+                    ""
+                )
+            Height: =30
+            Items: =Sort(Filter(col_Conceptos_Partes,Label3.Text in UdN),NAME,Ascending)
+            OnSelect: =Select(Parent)
+            Size: =10
+            Width: =251
+            X: =434
+            Y: =5
+            ZIndex: =14
+
+        Label7 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Text: =LookUp(col_Conceptos_Partes,Dropdown8.SelectedText.Value=NAME,Title)
+            Width: =50
+            X: =703
+            Y: =5
+            ZIndex: =15
+
+        TextInput6 As text:
+            Align: =Align.Center
+            Default: |
+                =If(
+                    horas_penoso_auto,
+                    ThisItem.HN,
+                    ""
+                )
+            Height: =30
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =753
+            Y: =5
+            ZIndex: =16
+
+        Dropdown8_1 As dropdown:
+            Height: =30
+            Items: =Sort(Filter(col_Conceptos_Partes,Label3.Text in UdN),NAME,Ascending)
+            OnSelect: =Select(Parent)
+            Size: =10
+            Width: =251
+            X: =434
+            Y: =35
+            ZIndex: =17
+
+        Label7_1 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Text: =LookUp(col_Conceptos_Partes,Dropdown8_1.SelectedText.Value=NAME,Title)
+            Width: =50
+            X: =703
+            Y: =35
+            ZIndex: =18
+
+        TextInput6_1 As text:
+            Align: =Align.Center
+            Default: =""
+            Height: =30
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =753
+            Y: =35
+            ZIndex: =19
+
+        Dropdown8_2 As dropdown:
+            Height: =30
+            Items: =Sort(Filter(col_Conceptos_Partes,Label3.Text in UdN),NAME,Ascending)
+            OnSelect: =Select(Parent)
+            Size: =10
+            Width: =251
+            X: =434
+            Y: =65
+            ZIndex: =20
+
+        Label7_2 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Text: =LookUp(col_Conceptos_Partes,Dropdown8_2.SelectedText.Value=NAME,Title)
+            Width: =50
+            X: =703
+            Y: =65
+            ZIndex: =21
+
+        TextInput6_2 As text:
+            Align: =Align.Center
+            Default: =""
+            Height: =30
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =753
+            Y: =65
+            ZIndex: =22
+
+        Dropdown8_3 As dropdown:
+            Default: =LookUp(col_Conceptos_Partes,ThisItem.Cod_Ausencias=Title,NAME)
+            DisplayMode: =If(IsBlank(ThisItem.Ausencias),DisplayMode.Edit,Disabled)
+            Height: =30
+            Items: =Sort(Filter(col_Conceptos_Partes,Label3.Text in UdN),NAME,Ascending)
+            OnSelect: =Select(Parent)
+            Size: =10
+            Width: =251
+            X: =434
+            Y: =95
+            ZIndex: =23
+
+        Label7_3 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Text: =If(!IsBlank(ThisItem.Ausencias),ThisItem.Cod_Ausencias,LookUp(col_Conceptos_Partes,Dropdown8_3.SelectedText.Value=NAME,Title))
+            Width: =50
+            X: =703
+            Y: =95
+            ZIndex: =24
+
+        TextInput6_3 As text:
+            Align: =Align.Center
+            Default: =ThisItem.Ausencias
+            Height: =30
+            OnSelect: =Select(Parent)
+            Width: =50
+            X: =753
+            Y: =95
+            ZIndex: =25
+
+        Label4_4 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="HN"
+            Width: =50
+            X: =256
+            Y: =5
+            ZIndex: =26
+
+        Label4_5 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="HE"
+            Width: =50
+            X: =231
+            Y: =35
+            ZIndex: =27
+
+        Label4_6 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="Dieta"
+            Width: =50
+            X: =232
+            Y: =65
+            ZIndex: =28
+
+        Label4_7 As label:
+            Align: =Align.Center
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: ="Viajes"
+            Width: =50
+            X: =256
+            Y: =95
+            ZIndex: =29
+
+        Label11 As label:
+            Align: =Align.Right
+            Height: =23
+            OnSelect: =Select(Parent)
+            Text: |-
+                ="01" & If(
+                    Dropdown9.SelectedText.Value = "ARRIGORRIAGA",
+                    "001",
+                    If(
+                        Dropdown9.SelectedText.Value = "ASTURIAS",
+                        "010",
+                        If(
+                            Dropdown9.SelectedText.Value = "CÁDIZ",
+                            "002",
+                            If(
+                                Dropdown9.SelectedText.Value = "CARTAGENA",
+                                "003",
+                                If(
+                                    Dropdown9.SelectedText.Value = "CORUÑA",
+                                    "004",
+                                    If(
+                                        Dropdown9.SelectedText.Value = "ERANDIO",
+                                        "008",
+                                        If(
+                                            Dropdown9.SelectedText.Value = "HUELVA",
+                                            "009",
+                                            If(
+                                                Dropdown9.SelectedText.Value = "PROYECTOS SINGULARES",
+                                                "011",
+                                                If(
+                                                    Dropdown9.SelectedText.Value = "PUERTOLLANO",
+                                                    "005",
+                                                    If(
+                                                        Dropdown9.SelectedText.Value = "SEVILLA",
+                                                        "006",
+                                                        If(
+                                                            Dropdown9.SelectedText.Value = "TALLER",
+                                                            "012",
+                                                            If(
+                                                                Dropdown9.SelectedText.Value = "TARRAGONA",
+                                                                "007"
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ) & If(
+                    Dropdown9_1.SelectedText.Value = "ANDAMIOS",
+                    "0005",
+                    If(
+                        Dropdown9_1.SelectedText.Value = "CONSTRUCCION",
+                        "0004",
+                        If(
+                            Dropdown9_1.SelectedText.Value = "IMPRODUCTIVOS",
+                            "0007",
+                            If(
+                                Dropdown9_1.SelectedText.Value = "INDUSTRIA",
+                                "0001",
+                                If(
+                                    Dropdown9_1.SelectedText.Value = "NAVAL",
+                                    "0002",
+                                    If(
+                                        Dropdown9_1.SelectedText.Value = "OFFSHORE",
+                                        "0003",
+                                        If(
+                                            Dropdown9_1.SelectedText.Value = "PINTURAS",
+                                            "0006"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ) & If(
+                    Len(TextInput8.Text) = 5,
+                    Left(
+                        TextInput8.Text,
+                        5
+                    ) & "00",
+                    Left(
+                        TextInput8.Text,
+                        5
+                    ) & Right(
+                        TextInput8.Text,
+                        2
+                    )
+                )
+            Visible: =!Rectangle7.Visible
+            Width: =239
+            X: =1014
+            Y: =5
+            ZIndex: =30
+
+        Subtitle4_3 As label:
+            BorderThickness: =1
+            Fill: =If(Len(ThisItem.Comentarios)>0,RGBA(0, 400,200, 0.3),RGBA(241, 244, 249, 1))
+            Height: =97
+            OnSelect: =Select(Parent)
+            Overflow: =Overflow.Scroll
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            TabIndex: =0
+            Text: =ThisItem.Comentarios
+            VerticalAlign: =VerticalAlign.Top
+            Width: =332
+            X: =1014
+            Y: =28
+            ZIndex: =31
+
+        Dropdown8_4 As dropdown:
+            Default: =ThisItem.Dieta
+            Height: =30
+            Items: =["207","208","212"]
+            OnSelect: =Select(Parent)
+            Size: =10
+            Tooltip: =LookUp(col_Conceptos_Partes,Value(Self.SelectedText.Value)=Value(Title),Concepto)
+            Width: =75
+            X: =281
+            Y: =65
+            ZIndex: =32
+
+        TextInput8 As text:
+            Align: =Align.Center
+            Default: =ThisItem.Montaje
+            Height: =18
+            HintText: =ThisItem.Montaje
+            OnChange: |
+                =If(
+                    IsBlank(
+                        If(
+                            Len(Self.Text)=7,
+                            LookUp(col_SAP_Montajes,Self.Text=Proyecto,CardName&" - "&Name),
+                            LookUp(col_SAP_Montajes,Left(Self.Text,5)=Left(Proyecto,5),CardName&" - "&Name)
+                        )
+                    ),
+                    Notify("El montaje introducido es incorrecto o no se encuentra activo",NotificationType.Error,2000)
+                )
+            OnSelect: =Select(Parent)
+            Width: =121
+            X: =68
+            Y: =84
+            ZIndex: =33
+
+        Icon5 As icon.Edit:
+            Height: =24
+            Icon: =Icon.ThumbsDownFilled
+            OnSelect: |-
+                =Set(verificar,true);UpdateContext({Registro_selec_gallery5:ThisItem})
+            Visible: =!(ThisItem.Horas_Fichadas ="DUPLICADO")
+            Width: =20
+            X: =2
+            Y: =18
+            ZIndex: =34
+
+        Label7_4 As label:
+            Height: =18
+            OnSelect: =Select(Parent)
+            Size: =8
+            Text: =LookUp(col_Conceptos_Partes,Value(ThisItem.Cod_Ausencias)=Value(Title),Concepto)
+            Width: =193
+            X: =808
+            Y: =102
+            ZIndex: =35
+
+        Triangle2 As triangle:
+            BorderColor: =RGBA(0, 0, 0, 1)
+            BorderThickness: =1
+            Fill: =RGBA(184, 0, 0, 1)
+            Height: =20
+            Visible: =And(!Or(ThisItem.Dieta="207",ThisItem.Dieta="208"),!IsBlank(ThisItem.Dieta))
+            Width: =19
+            X: =409
+            Y: =73
+            ZIndex: =36
+
+        Label55 As label:
+            Height: =15
+            OnSelect: =Select(Parent)
+            Size: =8
+            Text: |-
+                ="UdN: "&ThisItem.UdN
+            X: =1014
+            Y: =125
+            ZIndex: =37
+
+        Icon3 As icon.Save:
+            DisplayMode: =If(IsBlank(Dropdown9.SelectedText.Value),Disabled,Edit)
+            Height: =24
+            Icon: =Icon.Save
+            OnSelect: |-
+                =UpdateContext({popup_guardado: true});
+                //Guardo localmente los cambios para castilla
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': Label11.Text,
+                            CONCEPTO: Label4.Text,
+                            VALOR: TextInput5.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': Label11.Text,
+                            CONCEPTO: Dropdown8_5.SelectedText.Value,
+                            VALOR: TextInput5_1.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': Label11.Text,
+                            CONCEPTO: Dropdown8_4.SelectedText.Value,
+                            VALOR: TextInput5_2.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': Label11.Text,
+                            CONCEPTO: Label4_3.Text,
+                            VALOR: TextInput5_3.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': If(Label7.Text="112","010087777777",Label11.Text),
+                            CONCEPTO: Label7.Text,
+                            VALOR: TextInput6.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': If(Label7_1.Text="112","010087777777",Label11.Text),
+                            CONCEPTO: Label7_1.Text,
+                            VALOR: TextInput6_1.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': If(Label7_2.Text="112","010087777777",Label11.Text),
+                            CONCEPTO: Label7_2.Text,
+                            VALOR: TextInput6_2.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS,
+                        {
+                            FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                            EMPRESA: "1",
+                            TRABAJADOR: Subtitle4_2.Text,
+                            ORGANIGRAMA: "4",
+                            'PATH FORMAL': If(Label7_3.Text="112","010087777777",Label11.Text),
+                            CONCEPTO: Label7_3.Text,
+                            VALOR: TextInput6_3.Text,
+                            rectificacion: Rectificacion.Text,
+                            fecha_real: Subtitle4_1.Text
+                        }
+                    );
+                //Guardo los pendientes de actualizar localmente
+                    Collect(
+                        col_HORAS_SP_ACTUALIZACION,
+                        {
+                            ID_Actualizar: ThisItem.ID,
+                            ESTADO: "CASTILLA",
+                            Montaje: TextInput8.Text
+                        }
+                    );
+                //Borro registros en blanco
+                RemoveIf(
+                    col_CASTILLA_SP_NUEVOS,
+                    Or(IsBlank(VALOR),VALOR="0")
+                );
+                UpdateContext({cant_registros_nuevos: CountRows(col_CASTILLA_SP_NUEVOS)});
+                //Actualizo registros sharepoint de HORAS_SP y locales de col_HORAS_SP
+                ForAll(
+                    col_HORAS_SP_ACTUALIZACION,
+                    Collect(
+                        temp,
+                        1
+                    );
+                    Patch(
+                        HORAS_SP,
+                        LookUp(
+                            HORAS_SP,
+                            ID = ID_Actualizar
+                        ),
+                        {
+                            APROBACIÓN: "CASTILLA",
+                            Montaje: ThisRecord.Montaje
+                        }
+                    )
+                );
+                //Agrego registros a CASTILLA_SP
+                ForAll(
+                    col_CASTILLA_SP_NUEVOS,
+                    Collect(
+                        col_CASTILLA_SP_NUEVOS_guardadas,
+                        Patch(
+                            CASTILLA_SP,
+                            Defaults(CASTILLA_SP),
+                            {
+                                FECHA: ThisRecord.FECHA,
+                                EMPRESA: ThisRecord.EMPRESA,
+                                Title: ThisRecord.TRABAJADOR,
+                                ORGANIGRAMA: ThisRecord.ORGANIGRAMA,
+                                PATH_x0020_FORMAL: ThisRecord.'PATH FORMAL',
+                                CONCEPTO: ThisRecord.CONCEPTO,
+                                VALOR: ThisRecord.VALOR,
+                                rectificacion: ThisRecord.rectificacion,
+                                fecha_real: ThisRecord.fecha_real,
+                                UDN: Label3.Text
+                            }
+                        );
+                    )
+                );
+                
+                UpdateContext({cant_registros_nuevos: CountRows(col_CASTILLA_SP_NUEVOS)});
+                UpdateContext({cant_registros_guardados: CountRows(col_CASTILLA_SP_NUEVOS_guardadas)});
+                //Verifico si hubieron errores y me quedo con los registros que no se guardaron
+                If(
+                    IsEmpty(Errors(CASTILLA_SP)),
+                    Clear(col_CASTILLA_SP_NUEVOS);
+                    Clear(col_CASTILLA_SP_NUEVOS_guardadas);
+                    Clear(col_HORAS_SP_ACTUALIZACION);
+                
+                    //~~ Actualizo col local col_HORAS_SP ~~
+                    Patch(
+                        col_HORAS_SP,
+                        ThisItem,
+                        {APROBACIÓN : "CASTILLA"}
+                    );
+                    //~~ Actualizo col local col_HORAS_SP ~~
+                    Notify(
+                        "Se guardaron " & cant_registros_nuevos & " registros nuevos",
+                        Success,
+                        2000
+                    ),
+                    //false
+                    Notify(
+                        "Error al guardar " & cant_registros_nuevos - cant_registros_guardados & "registro/s a CASTILLA_SP, reintentar nuevamente más tarde",
+                        NotificationType.Error,
+                        5000
+                    )
+                );
+                UpdateContext({popup_guardado: false});
+                Clear(temp);
+            Width: =20
+            X: =2
+            Y: =95
+            ZIndex: =38
+
+        Dropdown8_5 As dropdown:
+            Default: |-
+                =If(
+                    Or(
+                        Weekday(Date(Value(Right(Subtitle4_1.Text,4)),Value(Mid(Subtitle4_1.Text,4,2)),Value(Left(Subtitle4_1.Text,2))))=7,
+                        Weekday(Date(Value(Right(Subtitle4_1.Text,4)),Value(Mid(Subtitle4_1.Text,4,2)),Value(Left(Subtitle4_1.Text,2))))=1
+                    ),
+                    "206"
+                )
+            Height: =30
+            Items: =["201","206","106","107"]
+            OnSelect: =Select(Parent)
+            Size: =10
+            Tooltip: =LookUp(col_Conceptos_Partes,Value(Self.SelectedText.Value)=Value(Title),Concepto)
+            Width: =75
+            X: =281
+            Y: =35
+            ZIndex: =39
+
+        Icon21 As icon.AddLibrary:
+            Height: =24
+            Icon: =Icon.AddLibrary
+            OnSelect: |-
+                =Patch(
+                    col_HORAS_SP,
+                    Defaults(HORAS_SP),
+                    {
+                        Codigo: Text(Value(ThisItem.Codigo)),
+                        Nombre: ThisItem.Nombre,
+                        Montaje: ThisItem.Montaje,
+                        Fecha: ThisItem.Fecha,
+                        UdN: ThisItem.UdN,
+                        APROBACIÓN: ThisItem.APROBACIÓN,
+                        Horas_Fichadas: "DUPLICADO",
+                        Lugar: ThisItem.Lugar,
+                        Comentarios:"DUPLICADO"
+                    }
+                )
+            Visible: =!(ThisItem.Horas_Fichadas ="DUPLICADO")
+            Width: =20
+            X: =2
+            Y: =56
+            ZIndex: =40
+
+        Icon22 As icon.Trash:
+            Height: =24
+            Icon: =Icon.Trash
+            OnSelect: =Remove(col_HORAS_SP,ThisItem)
+            Visible: =(ThisItem.Horas_Fichadas ="DUPLICADO")
+            Width: =20
+            X: =2
+            Y: =56
+            ZIndex: =41
+
+        Label59 As label:
+            Height: =15
+            OnSelect: =Select(Parent)
+            Size: =8
+            Text: |-
+                ="Creador: "&ThisItem.'Creado por'.DisplayName
+            Width: =250
+            X: =1116
+            Y: =125
+            ZIndex: =42
+
+        Rectificacion_Label As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 1)
+            BorderThickness: =1
+            Color: =RGBA(255, 255, 255, 1)
+            Fill: =RGBA(168, 0, 0, 1)
+            Height: =13
+            Size: =8
+            Text: ="RECTIFICACIÓN"
+            Visible: =Rectificacion.Text = "true"
+            Width: =93
+            X: =1253
+            Y: =10
+            ZIndex: =43
+
+        Rectificacion As label:
+            Height: =28
+            OnSelect: =Select(Parent)
+            Text: =Text(Date(Right(ThisItem.Fecha,4),Mid(ThisItem.Fecha,4,2),Left(ThisItem.Fecha,2)) < _fecha_corte)
+            Visible: =false
+            Width: =113
+            X: =1253
+            ZIndex: =44
+
+    TextInput4 As text:
+        Default: =""
+        DelayOutput: =true
+        Height: =32
+        HintText: ="Montaje"
+        Reset: =reset_form_all
+        Tooltip: ="FILTRO MONTAJE"
+        Width: =150
+        X: =62
+        Y: =1
+        ZIndex: =4
+
+    TextInput4_1 As text:
+        Default: =""
+        DelayOutput: =true
+        Height: =32
+        HintText: ="Código"
+        Reset: =reset_form_all
+        Tooltip: ="FILTRO NOMBRE"
+        Width: =150
+        X: =222
+        Y: =1
+        ZIndex: =5
+
+    TextInput4_2 As text:
+        Default: =""
+        DelayOutput: =true
+        Height: =32
+        HintText: ="Fecha"
+        Reset: =reset_form_all
+        Tooltip: ="FILTRO FECHA"
+        Width: =150
+        X: =382
+        Y: =1
+        ZIndex: =6
+
+    Dropdown9 As dropdown:
+        Default: =lugar_predeterminado.SelectedText.Value
+        Height: =28
+        Items: =["","ARRIGORRIAGA","ASTURIAS","CÁDIZ","CARTAGENA","CORUÑA","ERANDIO","HUELVA","PROYECTOS SINGULARES","PUERTOLLANO","SEVILLA","TALLER","TARRAGONA"]
+        Size: =10
+        Width: =200
+        X: =982
+        Y: =42
+        ZIndex: =7
+
+    Dropdown9_1 As dropdown:
+        Default: ="INDUSTRIA"
+        Height: =28
+        Items: =["ANDAMIOS","CONSTRUCCION","IMPRODUCTIVOS","INDUSTRIA","NAVAL","OFFSHORE","PINTURAS"]
+        Reset: =reset_form_all
+        Size: =10
+        Width: =200
+        X: =982
+        Y: =11
+        ZIndex: =8
+
+    Icon1_2 As icon.ChevronRight:
+        Height: =50
+        Icon: =Icon.ChevronLeft
+        OnSelect: =Navigate(Portada, ScreenTransition.Fade)
+        Width: =50
+        ZIndex: =9
+
+    Label3_1 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =32
+        Size: =16
+        Text: |-
+            ="Nº Operarios: "&CountRows(Gallery5.AllItems)
+        Width: =228
+        X: =549
+        Y: =50
+        ZIndex: =10
+
+    "Gallery6 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        BorderThickness: =2
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =398
+        Items: =Gallery5.Selected
+        Layout: =Layout.Vertical
+        TemplateFill: =RGBA(0, 400, 200, 0.3)
+        TemplatePadding: =0
+        TemplateSize: =398
+        Visible: =verificar
+        Width: =765
+        X: =306
+        Y: =169
+        ZIndex: =11
+
+        Image6 As image:
+            Height: =128
+            Image: =
+            OnSelect: =Select(Parent)
+            Width: =85
+            X: =14
+            Y: =36
+            ZIndex: =1
+
+        Title5 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.APROBACI_x00d3_N
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - Image6.Width - 104
+            X: =116
+            Y: =8
+            ZIndex: =2
+
+        Subtitle4 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |-
+                ="Nombre: "&ThisItem.Nombre
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title5.Width
+            X: =116
+            Y: =48
+            ZIndex: =3
+
+        Separator5 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+        Subtitle4_4 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |
+                ="Fecha: "&ThisItem.Fecha
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title5.Width
+            X: =116
+            Y: =92
+            ZIndex: =6
+
+        Subtitle4_5 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |-
+                ="HN: "&ThisItem.HN&"   HE: "&ThisItem.HE
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title5.Width
+            X: =116
+            Y: =132
+            ZIndex: =7
+
+        TextInput10 As text:
+            Align: =Align.Center
+            Default: =
+            Height: =148
+            Mode: =TextMode.MultiLine
+            OnSelect: =Select(Parent)
+            Width: =532
+            X: =116
+            Y: =234
+            ZIndex: =8
+
+        Icon6 As icon.Cancel:
+            Icon: =Icon.Cancel
+            OnSelect: =Set(verificar,false)
+            X: =686
+            Y: =16
+            ZIndex: =9
+
+        Icon15 As icon.ChevronRight:
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Patch(HORAS_SP,First(Gallery6.AllItems),{APROBACI_x00d3_N:"A VERIFICAR",Comentarios:TextInput10.Text});
+                Patch(col_HORAS_SP,ThisItem,{APROBACI_x00d3_N:"A VERIFICAR",Comentarios:TextInput10.Text});
+                Set(verificar,false);
+                Set(_Update_Pendiente,true)
+            X: =686
+            Y: =276
+            ZIndex: =10
+
+        Icon17 As icon.Trash:
+            Height: =46
+            Icon: =Icon.Trash
+            OnSelect: |+
+                =Patch(HORAS_SP,LookUp(HORAS_SP,ThisItem.ID = ID),{APROBACI_x00d3_N:"ELIMINADO",Comentarios:TextInput10.Text});
+                Remove(col_HORAS_SP,Registro_selec_gallery5);
+                Set(verificar,false);
+                Set(_Update_Pendiente,true)
+                
+            Width: =40
+            X: =35
+            Y: =285
+            ZIndex: =11
+
+        Label41 As label:
+            Height: =26
+            OnSelect: =Select(Parent)
+            Text: |-
+                ="Aprobado por: "&ThisItem.Aprobado_por
+            Width: =532
+            X: =116
+            Y: =168
+            ZIndex: =12
+
+        Label41_2 As label:
+            Height: =26
+            OnSelect: =Select(Parent)
+            Text: |-
+                ="Creado por: "&ThisItem.Author.DisplayName
+            Width: =532
+            X: =116
+            Y: =199
+            ZIndex: =13
+
+    Checkbox4 As checkbox:
+        CheckboxSize: =31
+        Height: =29
+        Text: ="Comentarios"
+        Width: =151
+        X: =62
+        Y: =41
+        ZIndex: =12
+
+    Button2 As button:
+        DisplayMode: =If(IsBlank(Dropdown9.SelectedText.Value),Disabled,Edit)
+        Height: =30
+        OnSelect: |+
+            =UpdateContext({popup_guardado: true});
+            Set(modif_CASTILLA_SP,true);
+            //Guardo localmente los cambios para castilla
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': Label11.Text,
+                        CONCEPTO: Label4.Text,
+                        VALOR: TextInput5.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': Label11.Text,
+                        CONCEPTO: Dropdown8_5.SelectedText.Value,
+                        VALOR: TextInput5_1.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': Label11.Text,
+                        CONCEPTO: Dropdown8_4.SelectedText.Value,
+                        VALOR: TextInput5_2.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': Label11.Text,
+                        CONCEPTO: Label4_3.Text,
+                        VALOR: TextInput5_3.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': If(Label7.Text="112","010087777777",Label11.Text),
+                        CONCEPTO: Label7.Text,
+                        VALOR: TextInput6.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': If(Label7_1.Text="112","010087777777",Label11.Text),
+                        CONCEPTO: Label7_1.Text,
+                        VALOR: TextInput6_1.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: If(Rectificacion.Text ="true" ,Text(Today(),"[$-es]dd/mm/yyyy"),Subtitle4_1.Text),
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': If(Label7_2.Text="112","010087777777",Label11.Text),
+                        CONCEPTO: Label7_2.Text,
+                        VALOR: TextInput6_2.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS,
+                    {
+                        FECHA: Subtitle4_1.Text,
+                        EMPRESA: "1",
+                        TRABAJADOR: Subtitle4_2.Text,
+                        ORGANIGRAMA: "4",
+                        'PATH FORMAL': If(Label7_3.Text="112","010087777777",Label11.Text),
+                        CONCEPTO: Label7_3.Text,
+                        VALOR: TextInput6_3.Text,
+                        rectificacion: Rectificacion.Text,
+                        fecha_real: Subtitle4_1.Text
+                    }
+                )
+            );
+            //Guardo los pendientes de actualizar localmente
+            ForAll(
+                Gallery5.AllItems,
+                Collect(
+                    col_HORAS_SP_ACTUALIZACION,
+                    {
+                        ID_Actualizar: ThisRecord.ID,
+                        ESTADO: "CASTILLA",
+                        Montaje: TextInput8.Text
+                    }
+                )
+            );
+            //Borro registros en blanco
+            RemoveIf(
+                col_CASTILLA_SP_NUEVOS,
+                Or(IsBlank(VALOR),VALOR="0")
+            );
+            UpdateContext({cant_registros_nuevos: CountRows(col_CASTILLA_SP_NUEVOS)});
+            //Actualizo registros sharepoint de HORAS_SP y locales de col_HORAS_SP
+            ForAll(
+                col_HORAS_SP_ACTUALIZACION,
+                Collect(
+                    temp,
+                    1
+                );
+                Patch(
+                    HORAS_SP,
+                    LookUp(
+                        HORAS_SP,
+                        ID = ID_Actualizar
+                    ),
+                    {
+                        APROBACI_x00d3_N: "CASTILLA",
+                        Montaje: ThisRecord.Montaje
+                    }
+                )
+            );
+            //Agrego registros a CASTILLA_SP
+            ForAll(
+                col_CASTILLA_SP_NUEVOS,
+                Collect(
+                    col_CASTILLA_SP_NUEVOS_guardadas,
+                    Patch(
+                        CASTILLA_SP,
+                        Defaults(CASTILLA_SP),
+                        {
+                            FECHA: ThisRecord.FECHA,
+                            EMPRESA: ThisRecord.EMPRESA,
+                            Title: ThisRecord.TRABAJADOR,
+                            ORGANIGRAMA: ThisRecord.ORGANIGRAMA,
+                            PATH_x0020_FORMAL: ThisRecord.'PATH FORMAL',
+                            CONCEPTO: ThisRecord.CONCEPTO,
+                            VALOR: ThisRecord.VALOR,
+                            rectificacion: ThisRecord.rectificacion,
+                            fecha_real: ThisRecord.fecha_real,
+                            UDN: Label3.Text
+            
+                        }
+                    );
+                )
+            );
+            
+            UpdateContext({cant_registros_nuevos: CountRows(col_CASTILLA_SP_NUEVOS)});
+            UpdateContext({cant_registros_guardados: CountRows(col_CASTILLA_SP_NUEVOS_guardadas)});
+            //Verifico si hubieron errores y me quedo con los registros que no se guardaron
+            If(
+                IsEmpty(Errors(CASTILLA_SP)),
+                Clear(col_CASTILLA_SP_NUEVOS);
+                Clear(col_CASTILLA_SP_NUEVOS_guardadas);
+                Clear(col_HORAS_SP_ACTUALIZACION);
+                Notify(
+                    "Se guardaron " & cant_registros_nuevos & " registros nuevos",
+                    Success,
+                    2000
+                ),
+                Notify(
+                    "Error al guardar " & cant_registros_nuevos - cant_registros_guardados & "registro/s a CASTILLA_SP, reintentar nuevamente más tarde",
+                    NotificationType.Error,
+                    5000
+                )
+            );
+            //Actualizo col local col_HORAS_SP
+            ClearCollect(
+                col_HORAS_SP,
+                Filter(
+                    HORAS_SP,
+                    APROBACI_x00d3_N = "APROBADO"
+                )
+            );
+            UpdateContext({popup_guardado: false});
+            UpdateContext({reset_form_all: true});
+            UpdateContext({reset_form_all: false});
+            Clear(temp);
+            Set(modif_CASTILLA_SP,false)
+            
+        Text: ="GUARDAR"
+        Width: =140
+        X: =1208
+        Y: =10
+        ZIndex: =13
+
+    Button8 As button:
+        Height: =30
+        OnSelect: |-
+            =UpdateContext({popup_info:true})
+        Text: ="MENÚ"
+        Width: =140
+        X: =810
+        Y: =10
+        ZIndex: =14
+
+    ComboBox4_1 As combobox:
+        DefaultSelectedItems: =[]
+        DisplayFields: =["UdN"]
+        Height: =31
+        InputTextPlaceholder: ="Buscar UdN"
+        IsSearchable: =false
+        Items: =GroupBy(col_HORAS_SP,"UdN","ID")
+        SearchFields: =["UdN"]
+        SearchItems: =[]
+        SelectMultiple: =false
+        Size: =10
+        Width: =308
+        X: =222
+        Y: =39
+        ZIndex: =15
+
+    Label54 As label:
+        Color: =RGBA(168, 0, 0, 1)
+        Height: =29
+        Size: =8
+        Text: ="Seleccionar Lugar"
+        Visible: =Rectangle7.Visible
+        Width: =181
+        X: =1185
+        Y: =41
+        ZIndex: =27
+
+    Popup_Guadado As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =27
+
+        Rectangle2_4 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_guardado
+            Width: =1366
+            ZIndex: =23
+
+        Rectangle3_4 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =296
+            Visible: =popup_guardado
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =24
+
+        Label27_4 As label:
+            Align: =Align.Center
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =149
+            Text: ="Guardando "&cant_registros_nuevos&" registros, por favor espere."
+            Visible: =popup_guardado
+            Width: =385
+            X: =530
+            Y: =250
+            ZIndex: =25
+
+        Label26_3 As label:
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =78
+            Text: |-
+                ="Progreso: "& IfError( Round((((CountRows(col_CASTILLA_SP_NUEVOS_guardadas)+CountRows(temp)*2)/(CountRows(col_HORAS_SP_ACTUALIZACION)*2+CountRows(col_CASTILLA_SP_NUEVOS)))*100),0)&"%","N/A")&" 
+                Tiempo restante estimado: "&RoundUp((((CountRows(col_HORAS_SP_ACTUALIZACION)*2+CountRows(col_CASTILLA_SP_NUEVOS))-((CountRows(col_CASTILLA_SP_NUEVOS_guardadas)+CountRows(temp)*2)))*1)/60,0)&" minuto/s"
+            Visible: =popup_guardado
+            Width: =317
+            X: =564
+            Y: =388
+            ZIndex: =26
+
+    Group7 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =29
+
+        Rectangle2_8 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_info
+            Width: =1366
+            ZIndex: =16
+
+        Rectangle3_8 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =451
+            Visible: =popup_info
+            Width: =383
+            X: =532
+            Y: =162
+            ZIndex: =17
+
+        Label27_8 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =72
+            Text: |-
+                ="Menú:"
+            Visible: =popup_info
+            Width: =574
+            X: =438
+            Y: =162
+            ZIndex: =18
+
+        Button6_2 As button:
+            OnSelect: |-
+                =UpdateContext({popup_info:false})
+            Text: ="Aceptar"
+            Visible: =popup_info
+            X: =644
+            Y: =540
+            ZIndex: =19
+
+        Button7_1 As button:
+            OnSelect: |-
+                =Navigate('Add Horas_Castilla', ScreenTransition.Fade);
+                UpdateContext({popup_info:false})
+            Text: ="CARGAR PARTES"
+            Visible: =popup_info
+            Width: =234
+            X: =607
+            Y: =250
+            ZIndex: =21
+
+        Button7_3 As button:
+            OnSelect: |-
+                =Navigate(Comprobacion_BI, ScreenTransition.Fade);
+                UpdateContext({popup_info:false})
+            Text: ="COMPROBACIÓN BI"
+            Visible: =popup_info
+            Width: =234
+            X: =607
+            Y: =304
+            ZIndex: =22
+
+        Button23 As button:
+            OnSelect: |-
+                =Navigate(Configuracion, ScreenTransition.Fade);
+                UpdateContext({popup_info:false})
+            Text: ="CONFIGURACIÓN"
+            Visible: =popup_info
+            Width: =234
+            X: =607
+            Y: =428
+            ZIndex: =28
+

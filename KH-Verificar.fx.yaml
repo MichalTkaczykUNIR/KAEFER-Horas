@@ -1,0 +1,742 @@
+Verificar As screen:
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    ImagePosition: =ImagePosition.Fill
+
+    Icon3_3 As icon.ChevronLeft:
+        Height: =50
+        Icon: =Icon.ChevronLeft
+        OnSelect: =Back(Fade)
+        Width: =50
+        Y: =8
+        ZIndex: =2
+
+    "Gallery2_1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Height: =674
+        Items: =Filter(HORAS_SP,'Aprobado por'=User().Email,APROBACIÓN="A VERIFICAR")
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =114
+        Width: =1366
+        Y: =94
+        ZIndex: =6
+
+        Image3_1 As image:
+            Image: |-
+                ="https://www.codigos-qr.com/qr/php/qr_img.php?d="&ThisItem.Codigo
+            OnSelect: =Select(Parent)
+            Width: =105
+            X: =81
+            Y: =4
+            ZIndex: =1
+
+        Title2_3 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.Nombre
+            VerticalAlign: =VerticalAlign.Top
+            Width: =500
+            X: =210
+            Y: =4
+            ZIndex: =2
+
+        Subtitle2_8 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.Fecha
+            VerticalAlign: =VerticalAlign.Top
+            Width: =200
+            X: =1166
+            ZIndex: =3
+
+        Separator2_1 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+        Subtitle2_7 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |-
+                ="Montaje: "&ThisItem.Montaje
+            VerticalAlign: =VerticalAlign.Top
+            Width: =250
+            X: =928
+            ZIndex: =11
+
+        Group6_1 As group:
+            Height: =5
+            Width: =5
+            X: =40
+            Y: =40
+            ZIndex: =11
+
+            Subtitle2_9 As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="HN: "&ThisItem.HN
+                VerticalAlign: =VerticalAlign.Top
+                X: =204
+                Y: =40
+                ZIndex: =6
+
+            Subtitle2_12 As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="HE: "&ThisItem.HE
+                VerticalAlign: =VerticalAlign.Top
+                X: =204
+                Y: =72
+                ZIndex: =7
+
+            Subtitle2_10 As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="Dietas: "&ThisItem.Dieta
+                VerticalAlign: =VerticalAlign.Top
+                X: =354
+                Y: =40
+                ZIndex: =8
+
+            Subtitle2_13 As label:
+                Height: =Self.Size * 1.8
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="Viajes: "&ThisItem.Viajes
+                VerticalAlign: =VerticalAlign.Top
+                X: =354
+                Y: =72
+                ZIndex: =9
+
+            Subtitle2_11 As label:
+                Height: =66
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: |-
+                    ="Comentarios: "
+                VerticalAlign: =VerticalAlign.Top
+                Width: =649
+                X: =529
+                Y: =43
+                ZIndex: =10
+
+        Title2_2 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |-
+                ="Código: "&ThisItem.Codigo
+            VerticalAlign: =VerticalAlign.Top
+            Width: =200
+            X: =705
+            ZIndex: =12
+
+        Icon4_1 As icon.Trash:
+            Height: =50
+            Icon: =Icon.Trash
+            OnSelect: |
+                =Patch(HORAS_SP,LookUp(HORAS_SP,ThisItem.ID = ID),{APROBACIÓN:"ELIMINADO"});
+                Remove(col_HORAS_SP,ThisItem);
+            Width: =44
+            X: =23
+            Y: =29
+            ZIndex: =13
+
+        TextInput11_1 As text:
+            Default: =ThisItem.Comentarios
+            DisplayMode: =DisplayMode.View
+            Height: =36
+            OnSelect: =Select(Parent)
+            Size: =10
+            Width: =433
+            X: =705
+            Y: =40
+            ZIndex: =14
+
+        Label28_5 As label:
+            Align: =Align.Center
+            BorderThickness: =1
+            Fill: =If(Len(Text(ThisItem.Ausencias))>0,RGBA(0, 255, 50, 0.3),RGBA(0, 0, 0, 0))
+            FontWeight: =FontWeight.Semibold
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: =LookUp(col_Conceptos_Partes,Title=ThisItem.Cod_Ausencias,Concepto)
+            Width: =300
+            X: =788
+            Y: =77
+            ZIndex: =17
+
+        Label28_6 As label:
+            Align: =Align.Center
+            BorderThickness: =1
+            Fill: =If(Len(Text(ThisItem.Ausencias))>0,RGBA(0, 255, 50, 0.3),RGBA(0, 0, 0, 0))
+            FontWeight: =FontWeight.Semibold
+            Height: =30
+            OnSelect: =Select(Parent)
+            Text: =ThisItem.Ausencias
+            Width: =50
+            X: =1088
+            Y: =77
+            ZIndex: =18
+
+        Label28_4 As label:
+            Align: =Align.Center
+            BorderThickness: =1
+            Fill: =If(Len(Text(ThisItem.Ausencias))>0,RGBA(0, 255, 50, 0.3),RGBA(0, 0, 0, 0))
+            Height: =30
+            OnSelect: =Select(Parent)
+            Size: =10
+            Text: |-
+                ="Ausencias:"
+            Width: =83
+            X: =705
+            Y: =77
+            ZIndex: =19
+
+        Rectangle1_3 As rectangle:
+            Fill: |-
+                =If(ThisItem.Horas_Fichadas="N/A",
+                    RGBA(0, 18, 107, 1),
+                    If(!IsBlank(ThisItem.Comentarios),
+                        RGBA(0, 18, 107, 1),
+                        If(Abs(RoundDown(Value(ThisItem.Horas_Fichadas-ThisItem.HN-ThisItem.HE),0))<=1,
+                            RGBA(54, 176, 75, 1),
+                            If(RoundDown(Value(ThisItem.Horas_Fichadas-ThisItem.HN-ThisItem.HE),0)>1,
+                                RGBA(255, 229, 0, 1),
+                                If(RoundDown(Value(ThisItem.Horas_Fichadas-ThisItem.HN-ThisItem.HE),0)<1,
+                                    RGBA(224, 22, 0, 1)
+                                )
+                            )
+                        )
+                    )
+                )
+            Height: =114
+            OnSelect: =Select(Parent)
+            Width: =10
+            ZIndex: =20
+
+        Label20_1 As label:
+            Height: =37
+            OnSelect: =Select(Parent)
+            Text: |-
+                ="Horas Fichaje: "& If(IsBlank(ThisItem.Horas_Fichadas),"0",ThisItem.Horas_Fichadas)
+            Width: =175
+            X: =530
+            Y: =74
+            ZIndex: =21
+
+        ID_reg_1 As label:
+            Height: =32
+            OnSelect: =Select(Parent)
+            Text: =ThisItem.ID
+            Visible: =false
+            Width: =57
+            X: =1268
+            Y: =47
+            ZIndex: =22
+
+        Button11 As button:
+            OnSelect: |-
+                =Select(Parent);
+                UpdateContext({Editar_Registro:true})
+            Text: ="Editar"
+            Width: =107
+            X: =1218
+            Y: =47
+            ZIndex: =23
+
+    Label13_1 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Text: |-
+            ="Registros: "&CountRows(Gallery2_1.AllItems)
+        Tooltip: =false
+        X: =813
+        Y: =10
+        ZIndex: =7
+
+    DataTable2_1 As dataTable.datatable:
+        BorderStyle: =BorderStyle.Solid
+        DisplayMode: =DisplayMode.Edit
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =601
+        Items: =Sort(Gallery2_1.AllItems,Nombre,Ascending)
+        Visible: =Widok
+        Width: =1366
+        X: =0
+        Y: =84
+        ZIndex: =8
+
+        Codigo_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Codigo"
+            FieldName: ="Codigo"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =3
+            Text: =ThisItem.Codigo
+            Width: =81
+            X: =0
+            Y: =0
+            ZIndex: =13
+
+        Comentarios_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Comentarios"
+            FieldName: ="Comentarios"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =10
+            Text: =ThisItem.Comentarios
+            Width: =311
+            X: =0
+            Y: =0
+            ZIndex: =14
+
+        Dieta_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Dieta"
+            FieldName: ="Dieta"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =8
+            Text: =ThisItem.Dieta
+            Width: =62
+            X: =0
+            Y: =0
+            ZIndex: =15
+
+        Fecha_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Fecha"
+            FieldName: ="Fecha"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =5
+            Text: =ThisItem.Fecha
+            Width: =117
+            X: =0
+            Y: =0
+            ZIndex: =16
+
+        HE_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="HE"
+            FieldName: ="HE"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =7
+            Text: =ThisItem.HE
+            Width: =61
+            X: =0
+            Y: =0
+            ZIndex: =17
+
+        HN_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="HN"
+            FieldName: ="HN"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =6
+            Text: =ThisItem.HN
+            Width: =65
+            X: =0
+            Y: =0
+            ZIndex: =18
+
+        Montaje_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Montaje"
+            FieldName: ="Montaje"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =4
+            Text: =ThisItem.Montaje
+            Width: =92
+            X: =0
+            Y: =0
+            ZIndex: =19
+
+        Nombre_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Nombre"
+            FieldName: ="Nombre"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =2
+            Text: =ThisItem.Nombre
+            Width: =348
+            X: =0
+            Y: =0
+            ZIndex: =20
+
+        Viajes_Columna2_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="Viajes"
+            FieldName: ="Viajes"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =9
+            Text: =ThisItem.Viajes
+            Width: =90
+            X: =0
+            Y: =0
+            ZIndex: =22
+
+        APROBACI_x00d3_N_Columna1_1 As dataTableColumn.textualColumn:
+            AutoWidth: =false
+            DisplayMode: =DisplayMode.Edit
+            FieldDisplayName: ="APROBACI_x00d3_N"
+            FieldName: ="APROBACI_x00d3_N"
+            FieldVariantName: ="textualColumn"
+            Height: =Parent.Height
+            LayoutHeight: =Parent.Height
+            Order: =11
+            Text: =ThisItem.APROBACIÓN
+            Width: =129
+            X: =0
+            Y: =0
+            ZIndex: =24
+
+    Icon13_2 As icon.Cancel:
+        Height: =50
+        Icon: =Icon.Information
+        OnSelect: |-
+            =UpdateContext({popup_info:true})
+        Width: =45
+        X: =1228
+        Y: =5
+        ZIndex: =14
+
+    Label43 As label:
+        FontWeight: =FontWeight.Semibold
+        Text: |-
+            ="Aprobados por: "&User().FullName
+        Width: =439
+        X: =105
+        Y: =9
+        ZIndex: =27
+
+    Popup_Info_3 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =27
+
+        Rectangle2_13 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_info
+            Width: =1366
+            ZIndex: =18
+
+        Rectangle3_13 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =350
+            Visible: =popup_info
+            Width: =574
+            X: =430
+            Y: =195
+            ZIndex: =19
+
+        Label27_10 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =45
+            Text: |-
+                ="Leyenda:"
+            Visible: =popup_info
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =20
+
+        Button6_3 As button:
+            OnSelect: |-
+                =UpdateContext({popup_info:false})
+            Text: ="Aceptar"
+            Visible: =popup_info
+            X: =637
+            Y: =465
+            ZIndex: =21
+
+        Circle1_8 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(0, 18, 107, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =475
+            Y: =267
+            ZIndex: =22
+
+        Circle1_9 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(54, 176, 75, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =475
+            Y: =317
+            ZIndex: =23
+
+        Circle1_10 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 229, 0, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =475
+            Y: =367
+            ZIndex: =24
+
+        Circle1_11 As circle:
+            BorderColor: =RGBA(128, 128, 128, 1)
+            BorderThickness: =1
+            Fill: =RGBA(224, 22, 0, 1)
+            Height: =30
+            Visible: =popup_info
+            Width: =30
+            X: =475
+            Y: =417
+            ZIndex: =25
+
+        Label33_2 As label:
+            Height: =176
+            LineHeight: =2.9
+            Text: |-
+                ="Registro con comentario o creado sin fichaje
+                Horas fichadas y asignadas concuerdan
+                Horas fichadas mayores a asignadas
+                Horas fichadas menores a asignadas"
+            Visible: =popup_info
+            Width: =453
+            X: =510
+            Y: =267
+            ZIndex: =26
+
+    "Gallery6_1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        BorderThickness: =2
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =375
+        Items: =Gallery2_1.Selected
+        Layout: =Layout.Vertical
+        TemplateFill: =RGBA(0, 400, 200, 0.3)
+        TemplatePadding: =0
+        TemplateSize: =372
+        Visible: =Editar_Registro
+        Width: =765
+        X: =306
+        Y: =169
+        ZIndex: =28
+
+        Image6_1 As image:
+            Height: =128
+            Image: =
+            OnSelect: =Select(Parent)
+            Width: =85
+            X: =14
+            Y: =36
+            ZIndex: =1
+
+        Title5_1 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: =ThisItem.APROBACIÓN
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - Image6_1.Width - 104
+            X: =116
+            Y: =8
+            ZIndex: =2
+
+        Subtitle4_6 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |-
+                ="Nombre: "&ThisItem.Nombre
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title5_1.Width
+            X: =116
+            Y: =48
+            ZIndex: =3
+
+        Separator5_1 As rectangle:
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+        Subtitle4_7 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |
+                ="Fecha: "&ThisItem.Fecha
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title5_1.Width
+            X: =116
+            Y: =92
+            ZIndex: =6
+
+        Subtitle4_8 As label:
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Text: |-
+                ="HN: "&ThisItem.HN&"   HE: "&ThisItem.HE
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title5_1.Width
+            X: =116
+            Y: =132
+            ZIndex: =7
+
+        TextInput10_1 As text:
+            Default: =ThisItem.Comentarios
+            Height: =148
+            Mode: =TextMode.MultiLine
+            OnSelect: =Select(Parent)
+            Width: =532
+            X: =116
+            Y: =212
+            ZIndex: =8
+
+        Icon6_1 As icon.Cancel:
+            Icon: =Icon.Cancel
+            OnSelect: |-
+                =UpdateContext({Editar_Registro:false});
+            X: =686
+            Y: =16
+            ZIndex: =9
+
+        Icon15_1 As icon.ChevronRight:
+            Icon: =Icon.ChevronRight
+            OnSelect: |-
+                =Patch(HORAS_SP,First(Gallery6_1.AllItems),{APROBACIÓN:"APROBADO",Comentarios:TextInput10_1.Text});
+                Patch(col_HORAS_SP,ThisItem,{APROBACIÓN:"APROBADO",Comentarios:TextInput10_1.Text});
+                UpdateContext({Editar_Registro:false});
+                Set(_Update_Pendiente,true)
+            X: =686
+            Y: =254
+            ZIndex: =10
+
+        Icon17_1 As icon.Trash:
+            Height: =46
+            Icon: =Icon.Trash
+            OnSelect: |-
+                =Patch(HORAS_SP,First(Gallery6_1.AllItems),{APROBACI_x00d3_N:"ELIMINADO",Comentarios:TextInput10.Text});
+                Patch(col_HORAS_SP,ThisItem,{APROBACI_x00d3_N:"ELIMINADO",Comentarios:TextInput10.Text});
+                UpdateContext({Editar_Registro:false});
+                Set(_Update_Pendiente,true)
+            Width: =40
+            X: =35
+            Y: =272
+            ZIndex: =11
+
+        Label41_1 As label:
+            OnSelect: =Select(Parent)
+            Text: |-
+                ="Aprobado por: "&ThisItem.'Aprobado por'
+            Width: =532
+            X: =116
+            Y: =168
+            ZIndex: =12
+
+    Label49 As label:
+        Align: =Align.Center
+        BorderThickness: =1
+        Fill: =RGBA(255, 255, 255, 1)
+        Height: =283
+        Text: ="No tiene mas registros pendientes de verificar"
+        Visible: =CountRows(Gallery2_1.AllItems)=0
+        Width: =548
+        X: =415
+        Y: =195
+        ZIndex: =29
+
+    Image9_3 As image:
+        Height: =45
+        Image: =KAEFER_Logo_Simple
+        Width: =234
+        X: =566
+        Y: =5
+        ZIndex: =30
+

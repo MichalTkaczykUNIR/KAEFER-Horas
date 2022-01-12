@@ -1,0 +1,1656 @@
+"'Add Horas' As screen":
+    BackgroundImage: ='Page-Background-Scaffoldinf'
+    ImagePosition: =ImagePosition.Fill
+    OnHidden: |-
+        =Set(_fecha_editar,Today());
+        Set(_Trabajador_editar,"");
+        Set(_montaje_editar,"");
+        Reset(ComboBox3)
+
+    Label12_24 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Dieta"
+        Width: =75
+        X: =846
+        Y: =160
+        ZIndex: =1
+
+    Checkbox7 As checkbox:
+        CheckboxSize: =50
+        Height: =48
+        Text: =""
+        Width: =62
+        X: =912
+        Y: =152
+        ZIndex: =2
+
+    Label12_33 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Salida"
+        Width: =75
+        X: =964
+        Y: =160
+        ZIndex: =3
+
+    Checkbox7_1 As checkbox:
+        CheckboxSize: =50
+        Height: =48
+        Text: =""
+        Width: =62
+        X: =1030
+        Y: =152
+        ZIndex: =4
+
+    Label37 As label:
+        Size: =10
+        Text: |-
+            ="Registros: "&CountRows(Gallery8.AllItems)
+        X: =896
+        Y: =224
+        ZIndex: =5
+
+    Label22 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(128, 128, 128, 1)
+        BorderThickness: =1
+        Fill: =RGBA(255, 255, 255, 1)
+        Text: =ComboBox3.Selected.Codigo
+        Width: =146
+        X: =337
+        Y: =110
+        ZIndex: =6
+
+    Label23 As label:
+        Text: =Text(DatePicker4.SelectedDate,"[$-es]dd/mm/yyyy")
+        Width: =183
+        X: =485
+        Y: =110
+        ZIndex: =7
+
+    Label12_18 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Nombre"
+        Width: =320
+        X: =6
+        Y: =70
+        ZIndex: =8
+
+    Label12_19 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Código"
+        Width: =157
+        X: =326
+        Y: =70
+        ZIndex: =9
+
+    Label12_20 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Fecha"
+        Width: =185
+        X: =483
+        Y: =70
+        ZIndex: =10
+
+    Label12_21 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Montaje"
+        Width: =171
+        X: =668
+        Y: =70
+        ZIndex: =11
+
+    Label12_22 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="HN"
+        Width: =50
+        X: =839
+        Y: =70
+        ZIndex: =12
+
+    Label12_23 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="HE"
+        Width: =50
+        X: =889
+        Y: =70
+        ZIndex: =13
+
+    Label12_26 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Comentarios"
+        Width: =146
+        X: =6
+        Y: =160
+        ZIndex: =14
+
+    Button10 As button:
+        DisplayMode: |-
+            =If(
+                And(
+                    !IsBlank(
+                        LookUp(
+                            col_SAP_Montajes,
+                            Left(
+                                TextInput7_18.Text,
+                                5
+                            ) = Left(
+                                Proyecto,
+                                5
+                            ),
+                            Name
+                        )
+                    ),
+                    !IsBlank(Label22),
+                    Or(
+                        And(!IsBlank(TextInput7_19),Value(TextInput7_19.Text)<>0),
+                        And(!IsBlank(TextInput7_20),Value(TextInput7_20.Text)<>0),
+                        And(!IsBlank(TextInput7_24),Value(TextInput7_24.Text)<>0),
+                        !IsBlank(TextInput7_23),
+                        Checkbox7.Value,
+                        Checkbox7_1.Value
+                    ),
+                    !Or(
+                        Value(TextInput7_19.Text) + Value(HN_verif.Text) > 8,
+                        Value(TextInput7_19.Text) + Value(HN_verif.Text) + Value(TextInput7_20.Text) + Value(HE_verif.Text) > 12
+                    )
+                ),
+                Edit,
+                Disabled
+            )
+        OnSelect: |-
+            =Collect(
+                ADDHORAS,
+                {
+                    Nombre: ComboBox3.Selected.'Full Name',
+                    Codigo: codigo_largo_1.Text,
+                    Fecha: Label23.Text,
+                    Comentarios: TextInput7_23.Text,
+                    MN: TextInput7_18.Text,
+                    HN: TextInput7_19.Text,
+                    HE: TextInput7_20.Text,
+                    Dietas: If(Checkbox7.Value,"207",If(Checkbox7_1.Value,"208")),
+                    Cod_Ausenc: Label5.Text,
+                    Ausencias: TextInput7_24.Text,
+                    Motivo: Dropdown7.SelectedText.Value,
+                    ID_Relativo: CountRows(ADDHORAS)+1
+                }
+            )
+        Text: ="Add Horas"
+        X: =502
+        Y: =224
+        ZIndex: =15
+
+    "Gallery8 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        Height: =470
+        Items: =Sort(ADDHORAS,ID_Relativo,Descending)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =36
+        Width: =1348
+        X: =9
+        Y: =298
+        ZIndex: =16
+
+        Image5 As image:
+            Height: =30
+            OnSelect: =Select(Parent)
+            Visible: =false
+            Width: =23
+            ZIndex: =1
+
+        Title7 As label:
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Nombre
+            Width: =250
+            Y: =2.5
+            ZIndex: =2
+
+        Subtitle5 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Codigo
+            Width: =100
+            X: =250
+            Y: =2.5
+            ZIndex: =3
+
+        Separator6 As rectangle:
+            Fill: =RGBA(153, 160, 196, 1)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =35
+            ZIndex: =5
+
+        Subtitle5_1 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Fecha
+            X: =350
+            Y: =2.5
+            ZIndex: =7
+
+        Subtitle5_2 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.MN
+            X: =500
+            Y: =2.5
+            ZIndex: =8
+
+        Subtitle5_3 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =28
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Comentarios
+            Width: =287
+            X: =813
+            Y: =2.5
+            ZIndex: =9
+
+        Title7_1 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            FontWeight: =FontWeight.Normal
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.HN
+            Width: =50
+            X: =650
+            Y: =2.5
+            ZIndex: =10
+
+        Subtitle5_4 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.HE
+            Width: =50
+            X: =700
+            Y: =2.5
+            ZIndex: =11
+
+        Subtitle5_5 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Dietas
+            Width: =50
+            X: =750
+            Y: =2.5
+            ZIndex: =12
+
+        Icon12 As icon.Trash:
+            Height: =30
+            Icon: =Icon.Trash
+            OnSelect: =Select(Parent);Remove(ADDHORAS,ThisItem)
+            Width: =30
+            X: =1302
+            Y: =2.5
+            ZIndex: =14
+
+        Subtitle5_7 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Cod_Ausenc
+            Width: =50
+            X: =1100
+            Y: =2.5
+            ZIndex: =15
+
+        Subtitle5_8 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Ausencias
+            Width: =50
+            X: =1150
+            Y: =2.5
+            ZIndex: =16
+
+        Subtitle5_9 As label:
+            Align: =Align.Center
+            Color: =RGBA(57, 57, 57, 1)
+            Height: =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: =ThisItem.Motivo
+            Width: =50
+            X: =1200
+            Y: =2.5
+            ZIndex: =17
+
+    Button10_1 As button:
+        DisplayMode: =If(CountRows(Gallery8.AllItems)=0,DisplayMode.Disabled,Edit)
+        OnSelect: |-
+            =UpdateContext(
+                {
+                    popup_guardado: true,
+                    cant_registros_nuevos: CountRows(Gallery8.AllItems),
+                    reset_form: true
+                }
+            );
+            ForAll(
+                Gallery8.AllItems,
+                Patch(
+                    HORAS_SP,
+                    Defaults(HORAS_SP),
+                    {
+                        Nombre: Title7.Text,
+                        Codigo: Subtitle5.Text,
+                        Fecha: Subtitle5_1.Text,
+                        Montaje: Subtitle5_2.Text,
+                        HN: Title7_1.Text,
+                        HE: Subtitle5_4.Text,
+                        Dieta: Subtitle5_5.Text,
+                        Comentarios: Subtitle5_3.Text,
+                        Ausencias: Subtitle5_8.Text,
+                        Cod_Ausencias: Subtitle5_7.Text,
+                        APROBACIÓN: "PENDIENTE",
+                        UdN: Label3.Text,
+                        'Motivo HE': Subtitle5_9.Text,
+                        Horas_Fichadas: "N/A",
+                        Lugar: Label3_5.Text
+                    }
+                );
+                Collect(
+                    col_temp2,
+                    1
+                )
+            );
+            Clear(ADDHORAS);
+            Clear(col_temp2);
+            Notify(
+                "Se guardaron correctamente " & cant_registros_nuevos & " registro/s nuevo/s",
+                Success,
+                2000
+            );
+            UpdateContext(
+                {
+                    popup_guardado: false,
+                    reset_form: false
+                }
+            );
+            Set(
+                _Update_Pendiente,
+                true
+            )
+        Text: ="Guardar Horas"
+        X: =727
+        Y: =224
+        ZIndex: =17
+
+    Label12_27 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(56, 96, 178, 1)
+        Fill: =RGBA(204, 231, 246, 1)
+        Text: ="Ausencias"
+        Width: =250
+        X: =1041
+        Y: =70
+        ZIndex: =18
+
+    Dropdown2 As dropdown:
+        Items: =["...","TARRAG. HORA LIBRE DISPOSICION", "FALTA SIN JUSTIFICAR", "BAJA MEDICA", "HORAS VACACIONES", "HORAS EXTRAS FESTIVAS"]
+        Reset: =reset_form
+        Size: =8
+        Width: =200
+        X: =1041
+        Y: =110
+        ZIndex: =19
+
+    Label5 As label:
+        Align: =Align.Center
+        Text: =LookUp(col_Conceptos_Partes,Dropdown2.SelectedText.Value=Concepto,Title)
+        Width: =47
+        X: =1071
+        Y: =70
+        ZIndex: =20
+
+    Label12_28 As label:
+        Align: =Align.Center
+        Fill: =RGBA(204, 231, 246, 1)
+        Size: =10
+        Text: ="Motivo HE"
+        Width: =75
+        X: =939
+        Y: =70
+        ZIndex: =21
+
+    Dropdown7 As dropdown:
+        Default: |-
+            =If(
+                !(Dropdown2.SelectedText.Value = "..."),
+                " "
+            )
+        DisplayMode: =If(Dropdown2.SelectedText.Value="...",Edit,Disabled)
+        Items: =[" ","1","2","3","4"]
+        Width: =75
+        X: =939
+        Y: =110
+        ZIndex: =22
+
+    Label34 As label:
+        Color: =RGBA(184, 0, 0, 1)
+        Height: =28
+        Size: =12
+        Text: ="Si quiere indicar una ausencia, utilizar el menú de ''Ausencias'' que se encuentra a la derecha."
+        Visible: =!IsBlank(TextInput7_23)
+        Width: =722
+        X: =159
+        Y: =195
+        ZIndex: =23
+
+    Icon14 As icon.Reload:
+        Height: =40
+        Icon: =Icon.Reset
+        OnSelect: |-
+            =UpdateContext({reset_form:true});
+            UpdateContext({reset_form:false});
+        Width: =33
+        X: =1317
+        Y: =70
+        ZIndex: =24
+
+    ComboBox3 As combobox:
+        Default: =LookUp(col_SAP_Operarios_Activos,Value(Codigo) = Value(_Trabajador_editar))
+        DefaultSelectedItems: =LookUp(col_SAP_Operarios_Activos,Value(Codigo) = Value(_Trabajador_editar))
+        DisplayFields: =["Full_x0020_Name"]
+        Items: =col_SAP_Operarios_Activos
+        Reset: =reset_form
+        SearchFields: =["Full_x0020_Name"]
+        SearchItems: =Search(col_SAP_Operarios_Activos,ComboBox3.SearchText,"Full_x0020_Name")
+        SelectMultiple: =false
+        X: =9
+        Y: =110
+        ZIndex: =25
+
+    TextInput7_18 As text:
+        Align: =Align.Center
+        Default: =_montaje_editar
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Reset: =reset_form
+        Width: =171
+        X: =668
+        Y: =110
+        ZIndex: =26
+
+    TextInput7_19 As text:
+        Align: =Align.Center
+        Default: =If(!(Dropdown2.SelectedText.Value="..."),"")
+        DisplayMode: =If(Dropdown2.SelectedText.Value="...",Edit,Disabled)
+        Fill: |-
+            =If(
+                Or(
+                    Value(Self.Text) + Value(HN_verif.Text) > 8,
+                    Value(Self.Text) + Value(HN_verif.Text) + Value(TextInput7_20.Text) + Value(HE_verif.Text) > 12
+                ),
+                RGBA(
+                    255,
+                    0,
+                    0,
+                    1
+                ),
+                RGBA(
+                    255,
+                    255,
+                    255,
+                    1
+                )
+            )
+        OnChange: |-
+            =If(
+                Or(
+                    Value(Self.Text) + Value(HN_verif.Text) + Value(HE_verif.Text) > 12,
+                    Value(TextInput2_20.Text) + Value(HN_1.Text) + Value(TextInput2_31.Text) + Value(TextInput2_34.Text) > 8
+                ),
+                Reset(Self)
+            )
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Reset: =reset_form
+        Width: =50
+        X: =839
+        Y: =110
+        ZIndex: =27
+
+    TextInput7_20 As text:
+        Align: =Align.Center
+        Default: |-
+            =If(
+                Or(
+                    !(Dropdown2.SelectedText.Value = "..."),
+                    Dropdown7.SelectedText.Value=" "
+                ),
+                ""
+            )
+        DisplayMode: =If(Dropdown2.SelectedText.Value="...",If(Dropdown7.SelectedText.Value=" ",Disabled,Edit),Disabled)
+        Fill: |-
+            =If(
+                Value(Self.Text) + Value(HE_verif.Text) + Value(TextInput7_19.Text) + Value(HN_verif.Text) > 12,
+                RGBA(255,0,0,1),
+                RGBA(255,255,255,1)
+            )
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Reset: =reset_form
+        Width: =50
+        X: =889
+        Y: =110
+        ZIndex: =28
+
+    TextInput7_23 As text:
+        Default: =""
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Reset: =reset_form
+        Width: =687
+        X: =152
+        Y: =160
+        ZIndex: =29
+
+    TextInput7_24 As text:
+        Align: =Align.Center
+        Default: =If(Dropdown2.SelectedText.Value="...","",8)
+        DisplayMode: =If(Dropdown2.SelectedText.Value="...",DisplayMode.Disabled,Edit)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Reset: =reset_form
+        Width: =50
+        X: =1241
+        Y: =110
+        ZIndex: =30
+
+    Icon10 As icon.ChevronLeft:
+        Height: =50
+        Icon: =Icon.ChevronLeft
+        OnSelect: =Back(Fade)
+        Width: =73
+        X: =6
+        Y: =6
+        ZIndex: =31
+
+    Label36 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =20
+        Size: =11
+        Text: ="Nombre, Apellido"
+        Width: =232
+        X: =6
+        Y: =276
+        ZIndex: =32
+
+    Label36_1 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =20
+        Size: =11
+        Text: ="Código"
+        Width: =89
+        X: =275
+        Y: =276
+        ZIndex: =33
+
+    Label36_2 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =20
+        Size: =11
+        Text: ="Fecha"
+        Width: =89
+        X: =392
+        Y: =276
+        ZIndex: =34
+
+    Label36_3 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =20
+        Size: =11
+        Text: ="Montaje"
+        Width: =89
+        X: =550
+        Y: =276
+        ZIndex: =35
+
+    Label36_4 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="HN"
+        Width: =35
+        X: =668
+        Y: =276
+        ZIndex: =36
+
+    Label36_5 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="HE"
+        Width: =35
+        X: =712
+        Y: =276
+        ZIndex: =37
+
+    Label36_6 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="Dieta"
+        Width: =56
+        X: =758
+        Y: =276
+        ZIndex: =38
+
+    Label36_8 As label:
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="Comentario"
+        Width: =212
+        X: =817
+        Y: =276
+        ZIndex: =39
+
+    Label36_9 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="Ausencia"
+        Width: =97
+        X: =1107
+        Y: =276
+        ZIndex: =40
+
+    Label36_10 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="Motivo HE"
+        Width: =97
+        X: =1193
+        Y: =276
+        ZIndex: =41
+
+    DatePicker4 As datepicker:
+        DefaultDate: =_fecha_editar
+        EndYear: =2022
+        OnChange: |-
+            =If(
+                Self.SelectedDate < _fecha_corte,
+                Set(_fecha_editar,Today());
+                UpdateContext({reset_date: true});
+                UpdateContext({reset_date: false});
+                Notify("El día que seleccionó se encuentra bloqueado para ingresar horas, seleccione una fecha posterior al "&_fecha_corte&", gracias.",NotificationType.Error,5000)
+            )
+        Reset: =Or(reset_form,reset_date)
+        StartOfWeek: =StartOfWeek.Monday
+        StartYear: =2021
+        Width: =183
+        X: =485
+        Y: =110
+        ZIndex: =42
+
+    Button9 As button:
+        Fill: =RGBA(184, 0, 0, 1)
+        HoverFill: =ColorFade(RGBA(184, 0, 0, 1), -20%)
+        OnSelect: |-
+            =UpdateContext({Popup_Horas_Cargadas:true})
+        Size: =10
+        Text: ="La persona seleccionada ya tiene horas en el día indicado, click aquí para ver"
+        Visible: =!IsEmpty(Gallery4.AllItems)
+        Width: =280
+        X: =195
+        Y: =224
+        ZIndex: =43
+
+    Montaje_valido As label:
+        Height: =56
+        Size: =10
+        Text: |
+            ="Montaje: "&
+            If(Len(TextInput7_18.Text)=7,
+                LookUp(col_SAP_Montajes,TextInput7_18.Text=Proyecto,CardName&" - "&Name),
+                LookUp(col_SAP_Montajes,Left(TextInput7_18.Text,5)=Left(Proyecto,5),CardName&" - "&Name)
+            )
+        VerticalAlign: =VerticalAlign.Top
+        Width: =238
+        X: =1083
+        Y: =160
+        ZIndex: =44
+
+    Label42 As label:
+        Color: =RGBA(184, 0, 0, 1)
+        Size: =10
+        Text: ="incorrecto / inactivo"
+        VerticalAlign: =VerticalAlign.Top
+        Visible: =And(IsBlank(LookUp(col_SAP_Montajes,Left(TextInput7_18.Text,5)=Left(Proyecto,5),CardName&Name)),!IsBlank(TextInput7_18))
+        Width: =213
+        X: =1153
+        Y: =179
+        ZIndex: =47
+
+    Label36_23 As label:
+        Align: =Align.Center
+        FontWeight: =FontWeight.Semibold
+        Height: =22
+        Size: =11
+        Text: ="Aprobación"
+        Visible: =Popup_Horas_Cargadas
+        Width: =97
+        X: =1074
+        Y: =216
+        ZIndex: =48
+
+    Image9_5 As image:
+        Height: =45
+        Image: =KAEFER_Logo_Simple
+        Width: =234
+        X: =566
+        Y: =9
+        ZIndex: =49
+
+    HN_verif As label:
+        Color: =RGBA(168, 0, 0, 1)
+        Text: |-
+            =Sum(
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        Codigo = Label22.Text,
+                        Codigo = codigo_largo_1.Text
+                    ),
+                    Fecha = Label23.Text
+                ),
+                Value(HN)
+            ) + Sum(
+                Filter(
+                    ADDHORAS,
+                    Or(
+                        Codigo = Label22.Text,
+                        Codigo = codigo_largo_1.Text
+                    ),
+                    Fecha = Label23.Text
+                ),
+                Value(HN)
+            )
+        Visible: =admin_vis
+        Width: =31
+        X: =1007
+        Y: =11
+        ZIndex: =50
+
+    HE_verif As label:
+        Color: =RGBA(168, 0, 0, 1)
+        Text: |-
+            =Sum(
+                Filter(
+                    HORAS_SP,
+                    Or(
+                        Codigo = Label22.Text,
+                        Codigo = codigo_largo_1.Text
+                    ),
+                    Fecha = Label23.Text
+                ),
+                Value(HE)
+            ) + Sum(
+                Filter(
+                    ADDHORAS,
+                    Or(
+                        Codigo = Label22.Text,
+                        Codigo = codigo_largo_1.Text
+                    ),
+                    Fecha = Label23.Text
+                ),
+                Value(HE)
+            )
+        Visible: =admin_vis
+        Width: =35
+        X: =1057
+        Y: =11
+        ZIndex: =51
+
+    codigo_largo_1 As label:
+        Color: =RGBA(168, 0, 0, 1)
+        Height: =38
+        Text: |
+            =If(
+                Len(Label22.Text)=6,
+                Text(Label22.Text),
+                    If(
+                        Len(Label22.Text)=5,
+                        "0"&Text(Label22.Text),
+                            If(
+                                Len(Label22.Text)=4,
+                                "00"&Text(Label22.Text),
+                                    If(
+                                        Len(Label22.Text)=3,
+                                        "000"&Text(Label22.Text),
+                                            If(
+                                                Len(Label22.Text)=2,
+                                                "0000"&Text(Label22.Text),
+                                                    If(
+                                                        Len(Label22.Text)=1,
+                                                        "00000"&Text(Label22.Text)
+                                                    )
+                                            )
+                                    )
+                            )
+                    )
+            )
+        Visible: =admin_vis
+        Width: =77
+        X: =912
+        Y: =12
+        ZIndex: =52
+
+    Icon13_5 As icon.Cancel:
+        Height: =44
+        Icon: =Icon.Information
+        OnSelect: |-
+            =UpdateContext({popup_info:true})
+        Width: =45
+        X: =1311
+        Y: =9
+        ZIndex: =53
+
+    Icono_Alerta As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =53
+
+        Triangle1 As triangle:
+            BorderColor: =RGBA(184, 0, 0, 1)
+            Fill: =RGBA(184, 0, 0, 1)
+            Height: =30
+            Visible: =And(IsBlank(LookUp(col_SAP_Montajes,Left(TextInput7_18.Text,5)=Left(Proyecto,5),CardName&Name)),!IsBlank(TextInput7_18))
+            Width: =30
+            X: =803
+            Y: =115
+            ZIndex: =45
+
+        Label39 As label:
+            Align: =Align.Center
+            Color: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Text: ="!"
+            VerticalAlign: =VerticalAlign.Bottom
+            Visible: =And(IsBlank(LookUp(col_SAP_Montajes,Left(TextInput7_18.Text,5)=Left(Proyecto,5),CardName&Name)),!IsBlank(TextInput7_18))
+            Width: =33
+            X: =801
+            Y: =110
+            ZIndex: =46
+
+    Button3_13 As button:
+        Fill: =RGBA(0, 18, 107, 1)
+        Height: =30
+        OnSelect: |-
+            =UpdateContext({popup_menu:true})
+        Text: ="MENÚ"
+        Width: =130
+        X: =1163
+        Y: =16
+        ZIndex: =54
+
+    Label21_1 As label:
+        FontWeight: =FontWeight.Bold
+        OnSelect: |-
+            =If(
+                User().Email="PujadasEnr@MyKAEFER.com",
+                UpdateContext({admin_vis:!admin_vis})
+            )
+        Text: ="Horas individuales"
+        Width: =196
+        X: =79
+        Y: =11
+        ZIndex: =55
+
+    Popup_Horas_Cargadas_1 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =78
+
+        Rectangle2_9 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =Popup_Horas_Cargadas
+            Width: =1366
+            ZIndex: =72
+
+        Rectangle3_9 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =602
+            Visible: =Popup_Horas_Cargadas
+            Width: =1004
+            X: =181
+            Y: =83
+            ZIndex: =73
+
+        Gallery4 As gallery.galleryVertical:
+            Height: =396
+            Items: |-
+                =If(
+                    Or(
+                        IsBlank(Label22),
+                        IsBlank(Label23)
+                    ),
+                    Filter(col_HORAS_SP,false),//BLANK
+                    Filter(
+                        HORAS_SP,
+                        Or(
+                            Codigo = Label22.Text,
+                            Codigo = Text(Value(Label22.Text))
+                        ),
+                        Or(
+                            APROBACIÓN = "CASTILLA",
+                            APROBACIÓN = "PENDIENTE",
+                            APROBACIÓN = "APROBADO",
+                            APROBACIÓN = "A VERIFICAR"
+                        ),
+                        Fecha = Label23.Text
+                    )
+                )
+            Layout: =Layout.Vertical
+            TemplateSize: =37
+            Visible: =Popup_Horas_Cargadas
+            Width: =1003
+            X: =181
+            Y: =238
+            ZIndex: =74
+
+            Rectangle1 As rectangle:
+                Fill: =If(Label35.Text="PENDIENTE",RGBA(255, 191, 0, 0.25),RGBA(100,100,0,0))
+                Height: =37
+                OnSelect: =Select(Parent)
+                Width: =993
+                ZIndex: =1
+
+            Subtitle5_12 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Montaje
+                Width: =90
+                X: =34
+                Y: =4
+                ZIndex: =2
+
+            Subtitle5_13 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Comentarios
+                Width: =251
+                X: =480
+                Y: =4
+                ZIndex: =3
+
+            Title7_3 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                FontWeight: =FontWeight.Normal
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.HN
+                Width: =50
+                X: =143
+                Y: =4
+                ZIndex: =4
+
+            Subtitle5_14 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.HE
+                Width: =50
+                X: =193
+                Y: =4
+                ZIndex: =5
+
+            Subtitle5_15 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Dieta
+                Width: =50
+                X: =338
+                Y: =4
+                ZIndex: =6
+
+            Subtitle5_16 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Viajes
+                Width: =50
+                X: =409
+                Y: =4
+                ZIndex: =7
+
+            Subtitle5_17 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Cod_Ausencias
+                Width: =50
+                X: =731
+                Y: =4
+                ZIndex: =8
+
+            Subtitle5_18 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.Ausencias
+                Width: =50
+                X: =818
+                Y: =4
+                ZIndex: =9
+
+            Subtitle5_19 As label:
+                Align: =Align.Center
+                Color: =RGBA(57, 57, 57, 1)
+                Height: =30
+                OnSelect: =Select(Parent)
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Size: =12
+                Text: =ThisItem.'Motivo HE'
+                Width: =50
+                X: =257
+                Y: =4
+                ZIndex: =10
+
+            Separator6_1 As rectangle:
+                Fill: =RGBA(153, 160, 196, 1)
+                Height: =1
+                OnSelect: =Select(Parent)
+                Width: =Parent.TemplateWidth
+                Y: =36
+                ZIndex: =11
+
+            Label35 As label:
+                Height: =37
+                OnSelect: =Select(Parent)
+                Size: =10
+                Text: =ThisItem.APROBACIÓN
+                Width: =95
+                X: =898
+                ZIndex: =12
+
+            Icon20_1 As icon.Trash:
+                Color: =RGBA(168, 0, 0, 1)
+                Height: =30
+                Icon: =Icon.Trash
+                OnSelect: |-
+                    =Patch(HORAS_SP,ThisItem,{APROBACIÓN:"ELIMINADO"});
+                    If(
+                        CountRows(Gallery4.AllItems)=0,
+                        UpdateContext({Popup_Horas_Cargadas:false})
+                    );
+                    Set(_Update_Pendiente,true);
+                Visible: |-
+                    =And(
+                        ThisItem.'Creado por'.DisplayName = User().FullName,
+                        Date(Right(ThisItem.Fecha,4),Mid(ThisItem.Fecha,4,2),Left(ThisItem.Fecha,2)) >= _fecha_corte,
+                        ThisItem.APROBACIÓN = "PENDIENTE"
+                    )
+                Width: =34
+                Y: =3
+                ZIndex: =13
+
+        Button12 As button:
+            Height: =38
+            OnSelect: |-
+                =UpdateContext({Popup_Horas_Cargadas:false})
+            Size: =13
+            Text: ="ACEPTAR"
+            Visible: =Popup_Horas_Cargadas
+            Width: =146
+            X: =608
+            Y: =637
+            ZIndex: =75
+
+        Label36_14 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Montaje"
+            Visible: =Popup_Horas_Cargadas
+            Width: =113
+            X: =223
+            Y: =216
+            ZIndex: =76
+
+        Label36_15 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="HN"
+            Visible: =Popup_Horas_Cargadas
+            Width: =35
+            X: =341
+            Y: =216
+            ZIndex: =77
+
+        Label36_16 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="HE"
+            Visible: =Popup_Horas_Cargadas
+            Width: =35
+            X: =385
+            Y: =216
+            ZIndex: =78
+
+        Label36_17 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Dieta"
+            Visible: =Popup_Horas_Cargadas
+            Width: =56
+            X: =526
+            Y: =216
+            ZIndex: =79
+
+        Label36_18 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Viajes"
+            Visible: =Popup_Horas_Cargadas
+            Width: =56
+            X: =593
+            Y: =216
+            ZIndex: =80
+
+        Label36_19 As label:
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Comentario"
+            Visible: =Popup_Horas_Cargadas
+            Width: =292
+            X: =657
+            Y: =216
+            ZIndex: =81
+
+        Label36_20 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Ausencia"
+            Visible: =Popup_Horas_Cargadas
+            Width: =97
+            X: =984
+            Y: =216
+            ZIndex: =82
+
+        Label36_21 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Motivo HE"
+            Visible: =Popup_Horas_Cargadas
+            Width: =97
+            X: =423
+            Y: =216
+            ZIndex: =83
+
+        Label44 As label:
+            Color: =RGBA(83, 83, 83, 1)
+            Height: =38
+            Text: =ComboBox3.Selected.'Full Name'
+            Visible: =Popup_Horas_Cargadas
+            Width: =283
+            X: =218
+            Y: =134
+            ZIndex: =84
+
+        Label45 As label:
+            Color: =RGBA(83, 83, 83, 1)
+            Text: =ComboBox3.Selected.Codigo
+            Visible: =Popup_Horas_Cargadas
+            X: =621
+            Y: =133
+            ZIndex: =85
+
+        Label46 As label:
+            Color: =RGBA(83, 83, 83, 1)
+            Text: =Label23.Text
+            Visible: =Popup_Horas_Cargadas
+            X: =888
+            Y: =133
+            ZIndex: =86
+
+        Label47 As label:
+            Height: =32
+            Text: |-
+                ="Nombre:"
+            Visible: =Popup_Horas_Cargadas
+            X: =218
+            Y: =110
+            ZIndex: =87
+
+        Label48 As label:
+            Height: =32
+            Text: |-
+                ="Código: "
+            Visible: =Popup_Horas_Cargadas
+            X: =617
+            Y: =110
+            ZIndex: =88
+
+        Label48_1 As label:
+            Height: =32
+            Text: |-
+                ="Fecha: "
+            Visible: =Popup_Horas_Cargadas
+            X: =887
+            Y: =110
+            ZIndex: =89
+
+        Label36_22 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Semibold
+            Height: =22
+            Size: =11
+            Text: ="Cod. Aus."
+            Visible: =Popup_Horas_Cargadas
+            Width: =97
+            X: =894
+            Y: =216
+            ZIndex: =90
+
+        Separator6_2 As rectangle:
+            Fill: =RGBA(153, 160, 196, 1)
+            Height: =1
+            OnSelect: =
+            Visible: =Popup_Horas_Cargadas
+            Width: =991
+            X: =186
+            Y: =238
+            ZIndex: =91
+
+    Popup_Guardado_3 As group:
+        Height: =5
+        Width: =5
+        X: =80
+        Y: =80
+        ZIndex: =81
+
+        Rectangle2_10 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_guardado
+            Width: =1366
+            ZIndex: =92
+
+        Rectangle3_10 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =296
+            Visible: =popup_guardado
+            Width: =550
+            X: =448
+            Y: =222
+            ZIndex: =93
+
+        Label27_9 As label:
+            Align: =Align.Center
+            Fill: =RGBA(255, 255, 255, 1)
+            FontWeight: =FontWeight.Bold
+            Height: =149
+            Text: |-
+                ="Guardando "&cant_registros_nuevos&" registros, por favor espere.
+                
+                
+                
+                "&"Progreso: "&//Round((CountRows(col_temp2)/cant_registros_nuevos*2)*100;0)
+                Round((CountRows(col_temp2)/(cant_registros_nuevos*2))*100,0)
+            Visible: =popup_guardado
+            Width: =385
+            X: =532
+            Y: =295
+            ZIndex: =94
+
+    Popup_Info_2 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =83
+
+        Rectangle2_23 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            Visible: =popup_info
+            Width: =1366
+            ZIndex: =56
+
+        Rectangle3_23 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =522
+            Visible: =popup_info
+            Width: =668
+            X: =390
+            Y: =58
+            ZIndex: =57
+
+        Label27_21 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =46
+            Text: |-
+                ="Leyenda:"
+            Visible: =popup_info
+            Width: =488
+            X: =480
+            Y: =70
+            ZIndex: =58
+
+        Button6_9 As button:
+            OnSelect: |-
+                =UpdateContext({popup_info:false})
+            Text: ="Aceptar"
+            Visible: =popup_info
+            X: =644
+            Y: =513
+            ZIndex: =59
+
+        Button7_12 As button:
+            OnSelect: =Navigate(Comprobacion_BI, ScreenTransition.Fade)
+            Text: ="ABRIR COMPROBACIÓN BI"
+            Visible: =popup_info
+            Width: =271
+            X: =589
+            Y: =430
+            ZIndex: =60
+
+        Label21_8 As label:
+            Height: =93
+            Size: =11
+            Text: |-
+                ="MN:    Montaje
+                HN:     Horas Normales
+                HE:     Horas Extra
+                DC:     Dieta Completa
+                DM:     Dieta Media (Salida)"
+            Visible: =popup_info
+            Width: =307
+            X: =500
+            Y: =172
+            ZIndex: =61
+
+        Label21_9 As label:
+            Height: =93
+            Size: =11
+            Text: |-
+                ="Motivos HE : 
+                1 - Parada
+                2 - Petición urgente del Cliente
+                3 - Imprevisto KAEFER
+                4 - Fin de semana y/o festivo"
+            Visible: =popup_info
+            Width: =307
+            X: =500
+            Y: =282
+            ZIndex: =62
+
+    Popup_Menu As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =106
+
+        Rectangle2_25 As rectangle:
+            Fill: =RGBA(255,255, 255, 0.5)
+            Height: =768
+            OnSelect: =Navigate(Modificar_Lista,Fade)
+            Visible: =popup_menu
+            Width: =1366
+            ZIndex: =63
+
+        Rectangle3_25 As rectangle:
+            BorderColor: =RGBA(153, 153, 153, 1)
+            BorderThickness: =1
+            Fill: =RGBA(255, 255, 255, 1)
+            Height: =587
+            OnSelect: =Navigate(Modificar_Lista,Fade)
+            Visible: =popup_menu
+            Width: =513
+            X: =467
+            Y: =73
+            ZIndex: =64
+
+        Label27_22 As label:
+            Align: =Align.Center
+            FontWeight: =FontWeight.Bold
+            Height: =72
+            OnSelect: =Navigate(Modificar_Lista,Fade)
+            Text: |-
+                ="Menú:"
+            Visible: =popup_menu
+            Width: =488
+            X: =480
+            Y: =91
+            ZIndex: =65
+
+        Button6_10 As button:
+            Fill: =RGBA(0, 18, 107, 1)
+            OnSelect: |-
+                =UpdateContext({popup_menu:false})
+            Text: ="Aceptar"
+            Visible: =popup_menu
+            X: =644
+            Y: =580
+            ZIndex: =66
+
+        Button7_15 As button:
+            OnSelect: |-
+                =Navigate(Comprobacion_BI,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Abrir comprobación BI"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =428
+            ZIndex: =67
+
+        Button1_6 As button:
+            OnSelect: |-
+                =Navigate(Modificar_Lista,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Modificar lista personal"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =335
+            ZIndex: =68
+
+        Button1_4 As button:
+            Fill: =RGBA(55, 122, 179, 1)
+            OnSelect: |-
+                =Navigate(Horas,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Lista Fichajes"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =180
+            ZIndex: =69
+
+        Button7_14 As button:
+            OnSelect: |-
+                =Navigate(Comprobacion_PA,Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Abrir comprobación PA"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =486
+            ZIndex: =70
+
+        Button17_1 As button:
+            Fill: =RGBA(0, 134, 208, 1)
+            OnSelect: |-
+                =Navigate(Horas_Lista,ScreenTransition.Fade);
+                UpdateContext({popup_menu:false})
+            Text: ="Lista Personal"
+            Visible: =popup_menu
+            Width: =317
+            X: =565
+            Y: =243
+            ZIndex: =71
+
