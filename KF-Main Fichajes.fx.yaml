@@ -1,0 +1,707 @@
+"'Main Fichajes' As screen":
+    BackgroundImage: =
+    Fill: =backcolor
+    Height: =Max(App.Height, App.DesignHeight)
+    LoadingSpinnerColor: =RGBA(164, 38, 44, 1)
+    Width: =Max(App.Width, App.DesignWidth)
+
+    Label9 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =appcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        Fill: =RGBA(255,255,255,0)
+        FocusedBorderThickness: =4
+        Font: =Font.Arial
+        FontWeight: =FontWeight.Bold
+        Height: =260
+        Size: =50
+        Text: =LookUp(col_usuarios,E_x002d_mail=Label18.Text,Lugar)
+        Width: =600
+        X: =20
+        Y: =240
+        ZIndex: =4
+
+    Label7 As label:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Semibold
+        Height: =165
+        Text: |-
+            ="Entradas: "&CountRows(col_entradas)&" "&
+            "Salidas: "&CountRows(col_salidas)&" "&
+            "Operarios: "&CountRows(col_operarios)&" "&
+            "Usuarios: "&CountRows(col_usuarios)
+        Width: =167
+        X: =473
+        Y: =500
+        ZIndex: =8
+
+    Rectangle1 As rectangle:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        DisabledFill: =RGBA(166, 166, 166, 1)
+        Fill: =appcolor
+        FocusedBorderThickness: =4
+        HoverFill: =RGBA(164, 38, 44, 1)
+        PressedFill: =RGBA(164, 38, 44, 1)
+        Width: =640
+        ZIndex: =10
+
+    Icon1 As icon.Reload:
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Color: =fontcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(220, 220, 220, 1)
+        DisabledFill: =RGBA(0, 0, 0, 0)
+        FocusedBorderThickness: =4
+        Height: =50
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        HoverFill: =RGBA(0, 0, 0, 0)
+        Icon: =Icon.Reload
+        OnSelect: |-
+            =Collect(col_usuarios,ShowColumns(Filter(KAEFER_Usuarios,Not(E_x002d_mail in col_usuarios.E_x002d_mail)),"E_x002d_mail","Lugar"));
+            Collect(col_operarios,ShowColumns(Filter(SAP_Operarios_Activos,Not('Full Name' in col_operarios.Full_x0020_Name)),"Full_x0020_Name","Codigo","Fechaalta","Fechabaja"));
+            ClearCollect(col_entradas,ShowColumns(Filter(Reg_Entradas,Fecha=Text(Today() ,"[$-es]dd/mm/yyyy")),"Codigo","Validar","HoraEntrada"));
+            ClearCollect(col_salidas,ShowColumns(Filter(Reg_Salidas,Fecha=Text(Today() ,"[$-es]dd/mm/yyyy")),"Codigo","Validar","HoraSalida"));
+            If(Label18_4.Text="Silver",Set(appcolor,Silver),
+            If(Label18_4.Text="DarkGrey",Set(appcolor,DarkGrey),
+            If(Label18_4.Text="SunnyYellow",Set(appcolor,SunnyYellow),
+            If(Label18_4.Text="PumpkinOrange",Set(appcolor,PumpkinOrange),
+            If(Label18_4.Text="AstralBlue",Set(appcolor,AstralBlue),
+            If(Label18_4.Text="OceanBlue",Set(appcolor,OceanBlue),
+            If(Label18_4.Text="AppleGreen",Set(appcolor,AppleGreen),
+            If(Label18_4.Text="ForrestGreen",Set(appcolor,ForrestGreen),
+            If(Label18_4.Text="Black",Set(appcolor,Black),
+            Set(appcolor,Red)
+            )))))))));
+            If(Label18_5.Text="Red",Set(fontcolor,Red),
+            If(Label18_5.Text="Silver",Set(fontcolor,Silver),
+            If(Label18_5.Text="DarkGrey",Set(fontcolor,DarkGrey),
+            If(Label18_5.Text="SunnyYellow",Set(fontcolor,SunnyYellow),
+            If(Label18_5.Text="PumpkinOrange",Set(fontcolor,PumpkinOrange),
+            If(Label18_5.Text="AstralBlue",Set(fontcolor,AstralBlue),
+            If(Label18_5.Text="OceanBlue",Set(fontcolor,OceanBlue),
+            If(Label18_5.Text="AppleGreen",Set(fontcolor,AppleGreen),
+            If(Label18_5.Text="ForrestGreen",Set(fontcolor,ForrestGreen),
+            If(Label18_5.Text="Black",Set(fontcolor,Black),
+            Set(fontcolor,White)
+            ))))))))));
+            If(Label18_6.Text="Redc",Set(backcolor,Redc),
+            If(Label18_6.Text="Silverc",Set(backcolor,Silverc),
+            If(Label18_6.Text="DarkGreyc",Set(backcolor,DarkGreyc),
+            If(Label18_6.Text="SunnyYellowc",Set(backcolor,SunnyYellowc),
+            If(Label18_6.Text="PumpkinOrangec",Set(backcolor,PumpkinOrangec),
+            If(Label18_6.Text="AstralBluec",Set(backcolor,AstralBluec),
+            If(Label18_6.Text="OceanBluec",Set(backcolor,OceanBluec),
+            If(Label18_6.Text="AppleGreenc",Set(backcolor,AppleGreenc),
+            If(Label18_6.Text="ForrestGreenc",Set(backcolor,ForrestGreenc),
+            If(Label18_6.Text="Blackc",Set(backcolor,Blackc),
+            Set(backcolor,White)
+            ))))))))))
+        PressedBorderColor: =RGBA(0, 0, 0, 0)
+        PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        PressedFill: =RGBA(0, 0, 0, 0)
+        Tooltip: ="Refrescar datos"
+        Width: =50
+        X: =25
+        Y: =25
+        ZIndex: =11
+
+    Label10 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =fontcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.Arial
+        FontWeight: =FontWeight.Bold
+        Height: =70
+        Size: =32
+        Text: ="KAEFER Fichajes"
+        Width: =400
+        X: =91
+        Y: =15
+        ZIndex: =12
+
+    Image3 As image:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledFill: =RGBA(0, 0, 0, 0)
+        FocusedBorderThickness: =4
+        Height: =130
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverFill: =RGBA(0, 0, 0, 0)
+        Image: ='KAEFER_Logo_RGB_transparent background'
+        PressedBorderColor: =RGBA(0, 0, 0, 0)
+        PressedFill: =RGBA(0, 0, 0, 0)
+        Width: =640
+        Y: =110
+        ZIndex: =13
+
+    Icon1_1 As icon.Reload:
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Color: =fontcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(220, 220, 220, 1)
+        DisabledFill: =RGBA(0, 0, 0, 0)
+        FocusedBorderThickness: =4
+        Height: =50
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        HoverFill: =RGBA(0, 0, 0, 0)
+        Icon: =Icon.Settings
+        OnSelect: =Navigate(Settings,Cover)
+        PressedBorderColor: =RGBA(0, 0, 0, 0)
+        PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        PressedFill: =RGBA(0, 0, 0, 0)
+        Tooltip: ="Configuración"
+        Width: =50
+        X: =570
+        Y: =25
+        ZIndex: =14
+
+    Group1 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =14
+
+        Image12 As image:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Image: =User().Image
+            OnSelect: |-
+                =If(Label18_1.Text="Administrativo",
+                    ClearCollect(col_entradasUsuario,Filter(Reg_Entradas,Codigo=Label12_1.Text));
+                ClearCollect(col_salidasUsuario,Filter(Reg_Salidas,Codigo=Label12_1.Text));
+                Navigate('Detalle usuario',Cover),
+                false)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            RadiusBottomLeft: =50
+            RadiusBottomRight: =50
+            RadiusTopLeft: =50
+            RadiusTopRight: =50
+            Tooltip: ="Detalle usuario"
+            X: =75
+            Y: =500
+            ZIndex: =5
+
+        Label18 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =55
+            Text: =User().Email
+            Width: =250
+            Y: =600
+            ZIndex: =6
+
+        Label18_1 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Text: =LookUp(KAEFER_Usuarios,User().Email='E-mail',Perfil)
+            Width: =250
+            Y: =660
+            ZIndex: =7
+
+        Label18_2 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =30
+            Text: =LookUp(KAEFER_Usuarios,User().Email='E-mail',Codigo)
+            Width: =250
+            Y: =700
+            ZIndex: =9
+
+    Rectangle1_2 As rectangle:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        DisabledFill: =RGBA(166, 166, 166, 1)
+        Fill: =appcolor
+        FocusedBorderThickness: =4
+        Height: =75
+        HoverFill: =RGBA(164, 38, 44, 1)
+        PressedFill: =RGBA(164, 38, 44, 1)
+        TabIndex: |
+            =3
+        Width: =640
+        Y: =1061
+        ZIndex: =15
+
+    Group2 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =15
+
+        Button2 As button:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Fill: =appcolor
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Bold
+            Height: =75
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+            OnSelect: |-
+                =Set(Tipo,"Entrada");
+                Set(scanValue,"");
+                Set(ukryj,true);
+                Navigate(Movimientos, ScreenTransition.Cover)
+            PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -50%)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            RadiusBottomLeft: =40
+            RadiusBottomRight: =40
+            RadiusTopLeft: =40
+            RadiusTopRight: =40
+            Size: =32
+            Text: ="ENTRADA"
+            Tooltip: ="Registrar Entrada"
+            Visible: =If(Len(Label9.Text)=0,false,true)
+            Width: =500
+            X: =80
+            Y: =758
+            ZIndex: =1
+
+        Button2_1 As button:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Fill: =appcolor
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Bold
+            Height: =75
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+            OnSelect: |-
+                =Set(Tipo,"Salida");
+                Set(scanValue,"");
+                Set(ukryj,true);
+                Navigate(Movimientos, ScreenTransition.Cover)
+            PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -50%)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            RadiusBottomLeft: =40
+            RadiusBottomRight: =40
+            RadiusTopLeft: =40
+            RadiusTopRight: =40
+            Size: =32
+            Text: ="SALIDA"
+            Tooltip: ="Registrar Salida"
+            Visible: =If(Len(Label9.Text)=0,false,true)
+            Width: =500
+            X: =80
+            Y: =858
+            ZIndex: =2
+
+        Button2_2 As button:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Fill: =appcolor
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Bold
+            Height: =75
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+            OnSelect: =Navigate('Lista movimientosSP', ScreenTransition.Cover)
+            PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -50%)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            RadiusBottomLeft: =40
+            RadiusBottomRight: =40
+            RadiusTopLeft: =40
+            RadiusTopRight: =40
+            Size: =32
+            Text: ="LISTA FICHAJES"
+            Tooltip: ="Lista de fichajes"
+            Width: =500
+            X: =80
+            Y: =958
+            ZIndex: =3
+
+    Label10_1 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =fontcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.Arial
+        FontWeight: =FontWeight.Semibold
+        Height: =70
+        Size: =20
+        Text: =Today()
+        Width: =500
+        X: =80
+        Y: =1066
+        ZIndex: =16
+
+    Group8 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =21
+
+        Label18_4 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            Size: =8
+            Text: =LookUp(KAEFER_Usuarios,User().Email='E-mail',appcolor)
+            Visible: =false
+            Width: =100
+            X: =540
+            Y: =216
+            ZIndex: =17
+
+        Label18_5 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            Size: =8
+            Text: =LookUp(KAEFER_Usuarios,User().Email='E-mail',fontcolor)
+            Visible: =false
+            Width: =100
+            X: =540
+            Y: =238
+            ZIndex: =18
+
+        Label18_6 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =20
+            Size: =8
+            Text: =LookUp(KAEFER_Usuarios,User().Email='E-mail',backcolor)
+            Visible: =false
+            Width: =100
+            X: =540
+            Y: =258
+            ZIndex: =19
+
+        Timer5 As timer:
+            AutoStart: =true
+            BorderColor: =RGBA(164, 38, 44, 1)
+            BorderStyle: =BorderStyle.None
+            DisabledBorderColor: =RGBA(244, 244, 244, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Duration: =2000
+            Fill: =RGBA(164, 38, 44, 1)
+            Font: =Font.'Segoe UI'
+            Height: =20
+            HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+            HoverColor: =RGBA(255, 255, 255, 1)
+            HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+            OnTimerEnd: |-
+                =If(Label18_4.Text="Silver",Set(appcolor,Silver),
+                If(Label18_4.Text="DarkGrey",Set(appcolor,DarkGrey),
+                If(Label18_4.Text="SunnyYellow",Set(appcolor,SunnyYellow),
+                If(Label18_4.Text="PumpkinOrange",Set(appcolor,PumpkinOrange),
+                If(Label18_4.Text="AstralBlue",Set(appcolor,AstralBlue),
+                If(Label18_4.Text="OceanBlue",Set(appcolor,OceanBlue),
+                If(Label18_4.Text="AppleGreen",Set(appcolor,AppleGreen),
+                If(Label18_4.Text="ForrestGreen",Set(appcolor,ForrestGreen),
+                If(Label18_4.Text="Black",Set(appcolor,Black),
+                Set(appcolor,Red)
+                )))))))));
+                If(Label18_5.Text="Red",Set(fontcolor,Red),
+                If(Label18_5.Text="Silver",Set(fontcolor,Silver),
+                If(Label18_5.Text="DarkGrey",Set(fontcolor,DarkGrey),
+                If(Label18_5.Text="SunnyYellow",Set(fontcolor,SunnyYellow),
+                If(Label18_5.Text="PumpkinOrange",Set(fontcolor,PumpkinOrange),
+                If(Label18_5.Text="AstralBlue",Set(fontcolor,AstralBlue),
+                If(Label18_5.Text="OceanBlue",Set(fontcolor,OceanBlue),
+                If(Label18_5.Text="AppleGreen",Set(fontcolor,AppleGreen),
+                If(Label18_5.Text="ForrestGreen",Set(fontcolor,ForrestGreen),
+                If(Label18_5.Text="Black",Set(fontcolor,Black),
+                Set(fontcolor,White)
+                ))))))))));
+                If(Label18_6.Text="Redc",Set(backcolor,Redc),
+                If(Label18_6.Text="Silverc",Set(backcolor,Silverc),
+                If(Label18_6.Text="DarkGreyc",Set(backcolor,DarkGreyc),
+                If(Label18_6.Text="SunnyYellowc",Set(backcolor,SunnyYellowc),
+                If(Label18_6.Text="PumpkinOrangec",Set(backcolor,PumpkinOrangec),
+                If(Label18_6.Text="AstralBluec",Set(backcolor,AstralBluec),
+                If(Label18_6.Text="OceanBluec",Set(backcolor,OceanBluec),
+                If(Label18_6.Text="AppleGreenc",Set(backcolor,AppleGreenc),
+                If(Label18_6.Text="ForrestGreenc",Set(backcolor,ForrestGreenc),
+                If(Label18_6.Text="Blackc",Set(backcolor,Blackc),
+                Set(backcolor,White)
+                ))))))))))
+            PaddingBottom: =2
+            PaddingLeft: =2
+            PaddingRight: =2
+            PaddingTop: =2
+            PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            Size: =8
+            Visible: =false
+            Width: =100
+            X: =540
+            Y: =282
+            ZIndex: =20
+
+    Group10_1 As group:
+        Height: =5
+        Width: =5
+        X: =20
+        Y: =20
+        ZIndex: =28
+
+        Icon1_10 As icon.Reload:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(220, 220, 220, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =50
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.FilterFlat
+            OnSelect: =Set(FiltroFichaje,true)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Tooltip: ="Siguiente"
+            Visible: =If(Label18_1.Text="Administrativo",true,false)
+            Width: =50
+            X: =500
+            Y: =25
+            ZIndex: =21
+
+        Rectangle3_1 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledFill: =RGBA(166, 166, 166, 1)
+            Fill: =fontcolor
+            FocusedBorderThickness: =4
+            Height: =500
+            HoverFill: =RGBA(164, 38, 44, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            Visible: =FiltroFichaje
+            Width: =640
+            Y: =100
+            ZIndex: =22
+
+        Dropdown3_4 As dropdown:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            ChevronBackground: =RGBA(255, 255, 255, 1)
+            ChevronDisabledBackground: =RGBA(244, 244, 244, 1)
+            ChevronDisabledFill: =RGBA(166, 166, 166, 1)
+            ChevronFill: =RGBA(33, 33, 33, 1)
+            ChevronHoverBackground: =RGBA(212, 212, 212, 1)
+            ChevronHoverFill: =RGBA(33, 33, 33, 1)
+            Color: =RGBA(51, 51, 51, 1)
+            Default: =Label9.Text
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Font: =Font.'Segoe UI'
+            HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverColor: =RGBA(51, 51, 51, 1)
+            HoverFill: =RGBA(212, 212, 212, 1)
+            Items: =Sort(GroupBy(Sort(Reg_Entradas,ID,Descending),"Centrodetrabajo","ID"),Centrodetrabajo,Ascending)
+            PaddingBottom: =5
+            PaddingLeft: =12
+            PaddingRight: =5
+            PaddingTop: =5
+            PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            SelectionFill: =RGBA(164, 38, 44, 1)
+            Size: =14
+            Visible: =FiltroFichaje
+            Width: =400
+            X: =140
+            Y: =200
+            ZIndex: =23
+
+        Dropdown3_3 As dropdown:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            ChevronBackground: =RGBA(255, 255, 255, 1)
+            ChevronDisabledBackground: =RGBA(244, 244, 244, 1)
+            ChevronDisabledFill: =RGBA(166, 166, 166, 1)
+            ChevronFill: =RGBA(33, 33, 33, 1)
+            ChevronHoverBackground: =RGBA(212, 212, 212, 1)
+            ChevronHoverFill: =RGBA(33, 33, 33, 1)
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            DisabledFill: =RGBA(244, 244, 244, 1)
+            Font: =Font.'Segoe UI'
+            HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverColor: =RGBA(51, 51, 51, 1)
+            HoverFill: =RGBA(212, 212, 212, 1)
+            Items: =Sort(GroupBy(Filter(Sort(Reg_Entradas,ID,Descending),'Centro de trabajo'=Dropdown3_4.SelectedText.Value),"Nombre","ID"),Nombre,Ascending)
+            PaddingBottom: =5
+            PaddingLeft: =12
+            PaddingRight: =5
+            PaddingTop: =5
+            PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedColor: =RGBA(255, 255, 255, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            SelectionFill: =RGBA(164, 38, 44, 1)
+            Size: =14
+            Visible: =FiltroFichaje
+            Width: =400
+            X: =140
+            Y: =300
+            ZIndex: =24
+
+        Icon2_1 As icon.Cancel:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            Color: =appcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(220, 220, 220, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.Cancel
+            OnSelect: =Set(FiltroFichaje,false)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =FiltroFichaje
+            X: =568
+            Y: =110
+            ZIndex: =25
+
+        Toggle1_1 As toggleSwitch:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            FalseFill: =RGBA(102, 102, 102, 1)
+            FalseHoverFill: =RGBA(33, 33, 33, 1)
+            FalseText: ="Nombre"
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            HandleFill: =RGBA(255, 255, 255, 1)
+            Height: =30
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            TrueFill: =RGBA(164, 38, 44, 1)
+            TrueHoverFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            TrueText: ="Nombre"
+            Visible: =FiltroFichaje
+            Width: =200
+            X: =240
+            Y: =375
+            ZIndex: =26
+
+        Label12_1 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.'Segoe UI'
+            Height: =48
+            Text: =LookUp(Reg_Entradas,Dropdown3_3.SelectedText.Value=Nombre,Codigo)
+            Visible: =FiltroFichaje
+            Width: =400
+            X: =140
+            Y: =450
+            ZIndex: =27
+

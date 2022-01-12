@@ -1,0 +1,71 @@
+App As appinfo:
+    BackEnabled: =false
+    ConfirmExit: =true
+    ConfirmExitMessage: ="Gracias!!     Que tengas un buen día!!"
+    MinScreenHeight: =320
+    MinScreenWidth: =320
+    OnStart: |-
+        =Collect(col_usuarios,ShowColumns(Filter(KAEFER_Usuarios,Not(E_x002d_mail in col_usuarios.E_x002d_mail)),"E_x002d_mail","Lugar"));
+        Collect(col_operarios,ShowColumns(Filter(SAP_Operarios_Activos,Not('Full Name' in col_operarios.Full_x0020_Name)),"Full_x0020_Name","Codigo","Fechaalta","Fechabaja"));
+        ClearCollect(col_entradas,ShowColumns(Filter(Reg_Entradas,Fecha=Text(Today() ,"[$-es]dd/mm/yyyy")),"Codigo","Validar","HoraEntrada"));
+        ClearCollect(col_salidas,ShowColumns(Filter(Reg_Salidas,Fecha=Text(Today() ,"[$-es]dd/mm/yyyy")),"Codigo","Validar","HoraSalida"));
+        Set(Red,RGBA(230,55,25,1));
+        Set(Silver,RGBA(146,158,165,1));
+        Set(DarkGrey,RGBA(44,65,74,1));
+        Set(SunnyYellow,RGBA(245,215,0,1));
+        Set(PumpkinOrange,RGBA(240,140,0,1));
+        Set(AstralBlue,RGBA(0,157,204,1));
+        Set(OceanBlue,RGBA(0,70,150,1));
+        Set(AppleGreen,RGBA(150,190,10,1));
+        Set(ForrestGreen,RGBA(0,120,95,1));
+        Set(White,RGBA(255,255,255,1));
+        Set(Black,RGBA(0,0,0,1));
+        Set(Redc,RGBA(230,55,25,0.2));
+        Set(Silverc,RGBA(146,158,165,0.2));
+        Set(DarkGreyc,RGBA(44,65,74,0.2));
+        Set(SunnyYellowc,RGBA(245,215,0,0.2));
+        Set(PumpkinOrangec,RGBA(240,140,0,0.2));
+        Set(AstralBluec,RGBA(0,157,204,0.2));
+        Set(OceanBluec,RGBA(0,70,150,0.2));
+        Set(AppleGreenc,RGBA(150,190,10,0.2));
+        Set(ForrestGreenc,RGBA(0,120,95,0.2));
+        Set(Blackc,RGBA(0,0,0,0.2));
+        Set(appcolor,Red);
+        Set(fontcolor,White);
+        Set(backcolor,Silverc);
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="Silver",Set(appcolor,Silver),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="DarkGrey",Set(appcolor,DarkGrey),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="SunnyYellow",Set(appcolor,SunnyYellow),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="PumpkinOrange",Set(appcolor,PumpkinOrange),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="AstralBlue",Set(appcolor,AstralBlue),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="OceanBlue",Set(appcolor,OceanBlue),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="AppleGreen",Set(appcolor,AppleGreen),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="ForrestGreen",Set(appcolor,ForrestGreen),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,appcolor)="Black",Set(appcolor,Black),
+        Set(appcolor,Red)
+        )))))))));
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="Red",Set(fontcolor,Red),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="Silver",Set(fontcolor,Silver),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="DarkGrey",Set(fontcolor,DarkGrey),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="SunnyYellow",Set(fontcolor,SunnyYellow),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="PumpkinOrange",Set(fontcolor,PumpkinOrange),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="AstralBlue",Set(fontcolor,AstralBlue),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="OceanBlue",Set(fontcolor,OceanBlue),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="AppleGreen",Set(fontcolor,AppleGreen),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="ForrestGreen",Set(fontcolor,ForrestGreen),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,fontcolor)="Black",Set(fontcolor,Black),
+        Set(fontcolor,White)
+        ))))))))));
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="Redc",Set(backcolor,Redc),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="Silverc",Set(backcolor,Silverc),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="DarkGreyc",Set(backcolor,DarkGreyc),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="SunnyYellowc",Set(backcolor,SunnyYellowc),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="PumpkinOrangec",Set(backcolor,PumpkinOrangec),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="AstralBluec",Set(backcolor,AstralBluec),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="OceanBluec",Set(backcolor,OceanBluec),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="AppleGreenc",Set(backcolor,AppleGreenc),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="ForrestGreenc",Set(backcolor,ForrestGreenc),
+        If(LookUp(KAEFER_Usuarios,User().Email=E_x002d_mail,backcolor)="Blackc",Set(backcolor,Blackc),
+        Set(backcolor,White)
+        ))))))))))
+

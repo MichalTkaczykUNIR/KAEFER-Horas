@@ -1,0 +1,28 @@
+Screen1 As screen:
+    LoadingSpinnerColor: =RGBA(164, 38, 44, 1)
+
+    "Map1 As 'Mapa (versión preliminar)'.pcfdataset":
+        BorderColor: =RGBA(0, 18, 107, 1)
+        CurrentLocation: =true
+        CurrentLocationLatitude: =Location.Latitude
+        CurrentLocationLongitude: =Location.Longitude
+        DefaultLatitude: =Location.Latitude
+        DefaultLocation: =true
+        DefaultLongitude: =Location.Longitude
+        DisplayMode: =DisplayMode.Edit
+        Height: =400
+        OnRouteDirectionChange: =false
+        PinColor: =RGBA(29, 114, 169, 1)
+        RouteMaintainOrder: =false
+        RouteOptimization: ="None"
+        RouteTravelMode: ="Car"
+        RouteWaypointsAddresses: =""
+        RouteWaypointsLabels: =""
+        RouteWaypointsLatitudes: =""
+        RouteWaypointsLongitudes: =""
+        UseRouting: =false
+        Width: =400
+        X: =40
+        Y: =40
+        ZIndex: =1
+

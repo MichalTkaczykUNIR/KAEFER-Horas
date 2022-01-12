@@ -1,0 +1,705 @@
+Movimientos As screen:
+    BackgroundImage: =
+    Fill: =backcolor
+    Height: =Max(App.Height, App.DesignHeight)
+    LoadingSpinnerColor: =RGBA(164, 38, 44, 1)
+    Width: =Max(App.Width, App.DesignWidth)
+
+    TextInput8 As text:
+        BorderColor: =RGBA(166, 166, 166, 1)
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        Default: =scanValue
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        Fill: =RGBA(0, 0, 0, 0)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Format: =TextFormat.Number
+        Height: =70
+        HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        HoverColor: =RGBA(51, 51, 51, 1)
+        HoverFill: =RGBA(255, 255, 255, 1)
+        PressedBorderColor: =RGBA(164, 38, 44, 1)
+        PressedColor: =RGBA(51, 51, 51, 1)
+        PressedFill: =RGBA(255, 255, 255, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =21
+        Width: =569
+        X: =45
+        Y: =260
+        ZIndex: =2
+
+    Button8 As button:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        Color: =fontcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        Fill: =appcolor
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Semibold
+        Height: =70
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverColor: =RGBA(255, 255, 255, 1)
+        HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+        OnSelect: |-
+            =If(
+                Label1.Text = "Entrada",
+                Patch(
+                    Reg_Entradas,
+                    Defaults(Reg_Entradas),
+                    {
+                        Codigo: Label24.Text,
+                        Fecha: Label23_1.Text,
+                        'Hora Entrada': Label23.Text,
+                        'Tipo Movimiento': Label1.Text,
+                        'Centro de trabajo': Label9.Text,
+                        Validar: Label3.Text,
+                        Validar1: Label3.Text & "-" & Label2_1.Text,
+                        Montaje: "",
+                        MontajeDescr: "",
+                        Encargado: User().FullName,
+                        GPS: Label4.Text,
+                        Nombre:TextInput1.Text,
+                        Motivo: Dropdown1.SelectedText.Value
+                    }
+                ),
+                Patch(
+                    Reg_Salidas,
+                    Defaults(Reg_Salidas),
+                    {
+                        Codigo: Label24.Text,
+                        Fecha: Label23_1.Text,
+                        HoraSalida: Label23.Text,
+                        TipoMovimiento: Label1.Text,
+                        Centrodetrabajo: Label9.Text,
+                        Validar: Label3.Text,
+                        Validar1: Label3.Text & "-" & Label2.Text,
+                        GPS: Label4.Text,
+                        Nombre:TextInput1.Text,
+                        Motivo: Dropdown1.SelectedText.Value
+                    }
+                )
+            );
+            If(
+                Label1.Text = "Entrada",
+                Collect(
+                    col_entradas,
+                    {
+                        Codigo: Label24.Text,
+                        Validar: Label3.Text,
+                        Nombre:TextInput1.Text,
+                        'Hora Entrada': Label23.Text
+                    }
+                ),
+                Collect(
+                    col_salidas,
+                    {
+                        Codigo: Label24.Text,
+                        Validar: Label3.Text,
+                        Nombre:TextInput1.Text,
+                        'Hora Salida': Label23.Text
+                    }
+                )
+            );
+            Set(
+                scanValue,
+                ""
+            );
+            Set(
+                czekaj,
+                false
+            );
+            Set(ukryj,true);
+            Select(BarcodeScanner1)
+        PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -50%)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        RadiusBottomLeft: =40
+        RadiusBottomRight: =40
+        RadiusTopLeft: =40
+        RadiusTopRight: =40
+        Size: =24
+        Text: ="GUARDAR"
+        Tooltip: ="Guardar registro"
+        Width: =235
+        X: =202
+        Y: =1063
+        ZIndex: =3
+
+    Label23 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Semibold
+        Height: =50
+        Size: =28
+        Text: =Text(HoraActual, DateTimeFormat.LongTime24)
+        Width: =560
+        X: =45
+        Y: =620
+        ZIndex: =4
+
+    Timer1 As timer:
+        AutoStart: =true
+        BorderColor: =RGBA(164, 38, 44, 1)
+        BorderStyle: =BorderStyle.None
+        DisabledBorderColor: =RGBA(244, 244, 244, 1)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        Duration: =1000
+        Fill: =RGBA(164, 38, 44, 1)
+        Font: =Font.'Segoe UI'
+        Height: =70
+        HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+        HoverColor: =RGBA(255, 255, 255, 1)
+        HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+        OnTimerEnd: =Set(HoraActual, Now() );Set(Fecha, Today())
+        PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        Repeat: =true
+        Size: =21
+        Visible: =false
+        Width: =83
+        Y: =1066
+        ZIndex: =5
+
+    BarcodeScanner1 As barcodeScanner:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        Color: =fontcolor
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        Fill: =appcolor
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Semibold
+        Height: =70
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverColor: =RGBA(255, 255, 255, 1)
+        HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+        OnCancel: =Select(Icon9_15)
+        OnScan: =Set(scanValue,BarcodeScanner1.Value);Refresh(Reg_Entradas);Refresh(Reg_Salidas);Set(czekaj,true);Set(ukryj,false)
+        PreferFrontCamera: =true
+        PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -50%)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        RadiusBottomLeft: =40
+        RadiusBottomRight: =40
+        RadiusTopLeft: =40
+        RadiusTopRight: =40
+        Size: =24
+        Text: ="Scan"
+        Tooltip: ="Escanear el código"
+        Visible: =ukryj
+        Width: =280
+        X: =185
+        Y: =168
+        ZIndex: =6
+
+    Icon9_15 As icon.ChevronLeft:
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Color: =RGBA(164, 38, 44, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(220, 220, 220, 1)
+        DisabledFill: =RGBA(0, 0, 0, 0)
+        FocusedBorderColor: =Icon9_15.BorderColor
+        FocusedBorderThickness: =4
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        HoverFill: =RGBA(0, 0, 0, 0)
+        Icon: =Icon.ChevronLeft
+        OnSelect: =Navigate('Main Fichajes', ScreenTransition.Fade)
+        PressedBorderColor: =RGBA(0, 0, 0, 0)
+        PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        PressedFill: =RGBA(0, 0, 0, 0)
+        Visible: =false
+        X: =17
+        Y: =14
+        ZIndex: =7
+
+    Label23_1 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Semibold
+        Height: =50
+        Size: =28
+        Text: =Text(Fecha ,"[$-es]dd/mm/yyyy")
+        Width: =560
+        X: =45
+        Y: =550
+        ZIndex: =8
+
+    "Gallery1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Height: =166
+        Items: =Filter(col_operarios,Codigo=Label24.Text)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =159
+        Y: =676
+        ZIndex: =9
+
+        Image1 As image:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =128
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Image: |-
+                ="https://www.codigos-qr.com/qr/php/qr_img.php?d="&Label24.Text
+            OnSelect: =Select(Parent)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Width: =128
+            X: =16
+            Y: =12
+            ZIndex: =1
+
+        Title1 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =20
+            Text: |-
+                ="Nombre: "&ThisItem.Full_x0020_Name
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - Image1.Width - 104
+            X: =Image1.X + Image1.Width + 24
+            Y: =12
+            ZIndex: =2
+
+        Subtitle1 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            Height: =Self.Size * 1.8
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =18
+            Text: |-
+                ="Codigo: "&ThisItem.Codigo
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title1.Width
+            X: =Title1.X
+            Y: =52
+            ZIndex: =3
+
+    TextInput1 As text:
+        Align: =Align.Center
+        BorderColor: =RGBA(166, 166, 166, 1)
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        Default: =LookUp(col_operarios,If(Len(Label24.Text)>1 ,Label24.Text in Codigo,""),Full_x0020_Name)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        DisplayMode: =DisplayMode.View
+        Fill: =RGBA(0, 0, 0, 0)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Height: =70
+        HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        HoverColor: =RGBA(51, 51, 51, 1)
+        HoverFill: =RGBA(255, 255, 255, 1)
+        PressedBorderColor: =RGBA(164, 38, 44, 1)
+        PressedColor: =RGBA(51, 51, 51, 1)
+        PressedFill: =RGBA(255, 255, 255, 1)
+        RadiusBottomLeft: =0
+        RadiusBottomRight: =0
+        RadiusTopLeft: =0
+        RadiusTopRight: =0
+        Size: =21
+        Width: =560
+        X: =40
+        Y: =330
+        ZIndex: =10
+
+    Label1 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Semibold
+        Height: =50
+        Size: =28
+        Text: =Tipo
+        Width: =560
+        X: =45
+        Y: =400
+        ZIndex: =11
+
+    Label2 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Height: =30
+        Size: =21
+        Text: =1+CountIf(col_salidas,Validar=Label3.Text)
+        Width: =200
+        X: =250
+        Y: =900
+        ZIndex: =12
+
+    Label3 As label:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Height: =70
+        Size: =21
+        Text: =TextInput8.Text&" - "&Label23_1.Text&" - "&Label9.Text
+        Width: =560
+        X: =40
+        Y: =833
+        ZIndex: =13
+
+    Label2_1 As label:
+        Align: =Align.Center
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Height: =30
+        Size: =21
+        Text: =1+CountIf(col_entradas,Validar=Label3.Text)
+        Width: =200
+        X: =50
+        Y: =900
+        ZIndex: =14
+
+    Label24 As label:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Height: =70
+        Size: =21
+        Text: =If(Len(TextInput8.Text)=6,TextInput8.Text,If(Len(TextInput8.Text)=5,"0"&TextInput8.Text,If(Len(TextInput8.Text)=4,"00"&TextInput8.Text,If(Len(TextInput8.Text)=3,"000"&TextInput8.Text,If(Len(TextInput8.Text)=2,"0000"&TextInput8.Text,If(Len(TextInput8.Text)=1,"00000"&TextInput8.Text,"000000"&TextInput8.Text))))))
+        Visible: =false
+        Width: =281
+        X: =326
+        Y: =260
+        ZIndex: =15
+
+    "Gallery2 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Height: =80
+        Items: =Filter(col_entradas,Codigo=Label24.Text)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =40
+        Width: =302
+        Y: =950
+        ZIndex: =16
+
+        Image2 As image:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =34
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            OnSelect: =Select(Parent)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =false
+            Width: =58
+            X: =16
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =1
+
+        Title2 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =20
+            Text: =ThisItem.HoraEntrada
+            VerticalAlign: =VerticalAlign.Top
+            Width: =235
+            X: =36
+            ZIndex: =2
+
+    "Gallery2_1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Height: =80
+        Items: =Filter(col_salidas,Codigo=Label24.Text)
+        Layout: =Layout.Vertical
+        TemplatePadding: =0
+        TemplateSize: =40
+        Width: =302
+        X: =326
+        Y: =950
+        ZIndex: =17
+
+        Image2_1 As image:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =34
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            OnSelect: =Select(Parent)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Visible: =false
+            Width: =58
+            X: =16
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =1
+
+        Title2_1 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =20
+            Text: =ThisItem.HoraSalida
+            VerticalAlign: =VerticalAlign.Top
+            Width: =235
+            X: =36
+            ZIndex: =2
+
+    Label4 As label:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        FocusedBorderThickness: =4
+        Font: =Font.'Segoe UI'
+        Height: =70
+        Size: =12
+        Text: =Round(Location.Latitude,4)&" ; "&Round(Location.Longitude,4)
+        Visible: =false
+        Width: =135
+        X: =504
+        Y: =14
+        ZIndex: =18
+
+    Timer2 As timer:
+        BorderColor: =RGBA(164, 38, 44, 1)
+        BorderStyle: =BorderStyle.None
+        DisabledBorderColor: =RGBA(244, 244, 244, 1)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        Duration: =1000
+        Fill: =RGBA(164, 38, 44, 1)
+        Font: =Font.'Segoe UI'
+        Height: =78
+        HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+        HoverColor: =RGBA(255, 255, 255, 1)
+        HoverFill: =ColorFade(RGBA(164, 38, 44, 1), -10%)
+        OnTimerEnd: =Select(Button8)
+        PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        Size: =21
+        Start: =czekaj
+        Visible: =false
+        Width: =121
+        ZIndex: =19
+
+    Dropdown1 As dropdown:
+        BorderColor: =RGBA(166, 166, 166, 1)
+        ChevronBackground: =RGBA(255, 255, 255, 1)
+        ChevronDisabledBackground: =RGBA(244, 244, 244, 1)
+        ChevronDisabledFill: =RGBA(166, 166, 166, 1)
+        ChevronFill: =RGBA(33, 33, 33, 1)
+        ChevronHoverBackground: =RGBA(212, 212, 212, 1)
+        ChevronHoverFill: =RGBA(33, 33, 33, 1)
+        Color: =RGBA(51, 51, 51, 1)
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledColor: =RGBA(166, 166, 166, 1)
+        DisabledFill: =RGBA(244, 244, 244, 1)
+        Fill: =backcolor
+        Font: =Font.'Segoe UI'
+        FontWeight: =FontWeight.Bold
+        Height: =50
+        HoverBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        HoverColor: =RGBA(51, 51, 51, 1)
+        HoverFill: =RGBA(212, 212, 212, 1)
+        Items: =If(Label1.Text="Entrada",["Incio de la jornada","Comida","Regreso asuntos laborales"],["Fin de la jornada","Comida","Salida asuntos laborales"])
+        PaddingBottom: =5
+        PaddingLeft: =12
+        PaddingRight: =5
+        PaddingTop: =5
+        PressedBorderColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+        PressedColor: =RGBA(255, 255, 255, 1)
+        PressedFill: =RGBA(164, 38, 44, 1)
+        SelectionFill: =RGBA(164, 38, 44, 1)
+        Size: =21
+        Tooltip: ="Seleccionar tipo de movimiento"
+        Visible: =If(Or(Label18_1.Text="Administrativo",Label18_1.Text="Indirecto"),true,false)
+        Width: =560
+        X: =45
+        Y: =470
+        ZIndex: =20
+
+    Image3_2 As image:
+        BorderColor: =RGBA(0, 0, 0, 0)
+        BorderStyle: =BorderStyle.None
+        BorderThickness: =2
+        DisabledBorderColor: =RGBA(0, 0, 0, 0)
+        DisabledFill: =RGBA(0, 0, 0, 0)
+        FocusedBorderThickness: =4
+        Height: =50
+        HoverBorderColor: =RGBA(0, 0, 0, 0)
+        HoverFill: =RGBA(0, 0, 0, 0)
+        Image: ='KAEFER_Logo_RGB_transparent background'
+        PressedBorderColor: =RGBA(0, 0, 0, 0)
+        PressedFill: =RGBA(0, 0, 0, 0)
+        Width: =200
+        X: =229
+        Y: =110
+        ZIndex: =24
+
+    Group7_3 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =42
+
+        Rectangle1_10 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledFill: =RGBA(166, 166, 166, 1)
+            Fill: =appcolor
+            FocusedBorderThickness: =4
+            Height: =75
+            HoverFill: =RGBA(164, 38, 44, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            Width: =640
+            Y: =1061
+            ZIndex: =1
+
+        Rectangle1_11 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledFill: =RGBA(166, 166, 166, 1)
+            Fill: =appcolor
+            FocusedBorderThickness: =4
+            HoverFill: =RGBA(164, 38, 44, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            Width: =640
+            ZIndex: =21
+
+        Icon1_9 As icon.Reload:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(220, 220, 220, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =50
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.ChevronLeft
+            OnSelect: =Navigate('Main Fichajes',ScreenTransition.CoverRight)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Tooltip: ="Volver"
+            Width: =50
+            X: =25
+            Y: =25
+            ZIndex: =22
+
+        Label10_10 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Bold
+            Height: =50
+            Size: =26
+            Text: ="Fichaje"
+            Width: =500
+            X: =75
+            Y: =25
+            ZIndex: =23
+

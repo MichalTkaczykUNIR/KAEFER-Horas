@@ -1,0 +1,279 @@
+"'Lista movimientosSP_1' As screen":
+    BackgroundImage: =
+    Fill: =backcolor
+    Height: =Max(App.Height, App.DesignHeight)
+    LoadingSpinnerColor: =RGBA(164, 38, 44, 1)
+    Width: =Max(App.Width, App.DesignWidth)
+
+    "Gallery8_2 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver4.0'":
+        BorderColor: =RGBA(166, 166, 166, 1)
+        Height: =961
+        Items: |-
+            =If(Toggle1_1.Value,
+                Sort(Filter(Reg_Salidas,Centrodetrabajo=Dropdown3_4.SelectedText.Value,Nombre=Dropdown3_3.SelectedText.Value),Created,Descending),
+                 Sort(Filter(Reg_Salidas,Centrodetrabajo=Dropdown3_4.SelectedText.Value),Created,Descending)
+            )
+        Layout: =Layout.Vertical
+        ShowScrollbar: =false
+        TemplatePadding: =0
+        TemplateSize: =157
+        Y: =100
+        ZIndex: =1
+
+        Image7_2 As image:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =128
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Image: =If(Len(LookUp(Empleados_SP,Codigo=ThisItem.Codigo,Foto))=0,'KAEFER_Logo_RGB_transparent background',LookUp(Empleados_SP,Codigo=ThisItem.Codigo,Foto))
+            OnSelect: =Select(Parent)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Width: =128
+            X: =16
+            Y: =20
+            ZIndex: =1
+
+        Title6_3 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: |
+                =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =16
+            Text: =LookUp(col_operarios,ThisItem.Codigo in Codigo,Full_x0020_Name)
+            VerticalAlign: =VerticalAlign.Top
+            Width: =400
+            X: =160
+            Y: =5
+            ZIndex: =2
+
+        Subtitle6_7 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            Height: |
+                =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =16
+            Text: =ThisItem.TipoMovimiento
+            VerticalAlign: =VerticalAlign.Top
+            Width: =400
+            X: =160
+            Y: =95
+            ZIndex: =3
+
+        Separator6_2 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            Fill: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =5
+
+        Subtitle6_6 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            Height: |
+                =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =16
+            Text: =ThisItem.Fecha&"   "&ThisItem.HoraSalida
+            VerticalAlign: =VerticalAlign.Top
+            Width: =400
+            X: =160
+            Y: =65
+            ZIndex: =6
+
+        Subtitle6_8 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            Height: |
+                =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =16
+            Text: =ThisItem.Validar1
+            VerticalAlign: =VerticalAlign.Top
+            Width: =400
+            X: =160
+            Y: =125
+            ZIndex: =7
+
+        Title6_4 As label:
+            Color: =RGBA(51, 51, 51, 1)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            Font: =Font.'Segoe UI'
+            FontWeight: =FontWeight.Semibold
+            Height: |
+                =30
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =16
+            Text: =ThisItem.Codigo
+            VerticalAlign: =VerticalAlign.Top
+            Width: =400
+            X: =160
+            Y: =35
+            ZIndex: =8
+
+        Image7_4 As image:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Image: =LookUp(Empleados_SP,Codigo=ThisItem.Codigo,QR)
+            OnSelect: =Select(Parent)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            X: =523
+            Y: =20
+            ZIndex: =9
+
+    Group7_2 As group:
+        Height: =5
+        Width: =5
+        X: =40
+        Y: =40
+        ZIndex: =8
+
+        Rectangle1_9 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledFill: =RGBA(166, 166, 166, 1)
+            Fill: =appcolor
+            FocusedBorderThickness: =4
+            HoverFill: =RGBA(164, 38, 44, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            Width: =640
+            ZIndex: =2
+
+        Icon1_7 As icon.Reload:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(220, 220, 220, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =50
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.ChevronLeft
+            OnSelect: =Navigate('Lista movimientosSP',ScreenTransition.CoverRight)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Tooltip: ="Volver"
+            Width: =50
+            X: =25
+            Y: =25
+            ZIndex: =3
+
+        Label10_8 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Bold
+            Height: =50
+            Size: =26
+            Text: ="Registro Salidas"
+            Width: =500
+            X: =75
+            Y: =25
+            ZIndex: =4
+
+        Icon1_6 As icon.Reload:
+            BorderColor: =RGBA(166, 166, 166, 1)
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(220, 220, 220, 1)
+            DisabledFill: =RGBA(0, 0, 0, 0)
+            FocusedBorderThickness: =4
+            Height: =50
+            HoverBorderColor: =RGBA(0, 0, 0, 0)
+            HoverColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            HoverFill: =RGBA(0, 0, 0, 0)
+            Icon: =Icon.Add
+            OnSelect: =Navigate(Movimientos,Cover)
+            PressedBorderColor: =RGBA(0, 0, 0, 0)
+            PressedColor: =ColorFade(RGBA(164, 38, 44, 1), -30%)
+            PressedFill: =RGBA(0, 0, 0, 0)
+            Tooltip: ="Nuevo registro"
+            Width: =50
+            X: =570
+            Y: =25
+            ZIndex: =5
+
+        Rectangle1_8 As rectangle:
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            DisabledFill: =RGBA(166, 166, 166, 1)
+            Fill: =appcolor
+            FocusedBorderThickness: =4
+            Height: =75
+            HoverFill: =RGBA(164, 38, 44, 1)
+            PressedFill: =RGBA(164, 38, 44, 1)
+            Width: =640
+            Y: =1061
+            ZIndex: =6
+
+        Label10_7 As label:
+            Align: =Align.Center
+            BorderColor: =RGBA(0, 0, 0, 0)
+            BorderStyle: =BorderStyle.None
+            BorderThickness: =2
+            Color: =fontcolor
+            DisabledBorderColor: =RGBA(0, 0, 0, 0)
+            DisabledColor: =RGBA(166, 166, 166, 1)
+            FocusedBorderThickness: =4
+            Font: =Font.Arial
+            FontWeight: =FontWeight.Semibold
+            Height: =70
+            Size: =20
+            Text: =Today()
+            Width: =500
+            X: =80
+            Y: =1066
+            ZIndex: =7
+
